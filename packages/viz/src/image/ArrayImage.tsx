@@ -123,7 +123,10 @@ export function ArrayImage({
   const safeDomain: Domain = domain && domain[0] < domain[1] ? domain : [0, 1];
   return (
     <div className={className ?? "flex h-full min-h-0 w-full"}>
-      <div className="relative min-h-0 min-w-0 flex-1">
+      {/* a flex container: H5Web's VisCanvas is styled as a flex item (flex: 1, z-index: 0), and that
+          z-index is what keeps its layers, drawn at negative z-indices, inside its own stacking context;
+          as a block child they would paint under any opaque background higher up */}
+      <div className="relative flex min-h-0 min-w-0 flex-1">
         <VisCanvas abscissaConfig={abscissa} ordinateConfig={ordinate} aspect={aspect}>
           <DefaultInteractions />
           <ResetZoomButton />
