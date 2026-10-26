@@ -12,6 +12,8 @@ import { errorFrom } from "./errors";
 
 export const SHAPE_HEADER = "x-array-shape";
 export const DTYPE_HEADER = "x-array-dtype";
+/** A little JSON describing the array (a sampling factor, an offset, a color range). */
+export const META_HEADER = "x-array-meta";
 
 export type DtypeCode = "i1" | "u1" | "i2" | "u2" | "i4" | "u4" | "i8" | "u8" | "f4" | "f8";
 
@@ -40,12 +42,14 @@ const CONSTRUCTORS = {
   f8: Float64Array,
 } as const;
 
-export interface WireArray<T extends TypedArray = TypedArray> {
+export interface WireArray<T extends TypedArray = TypedArray, M = unknown> {
   /** The values, row-major (C order). */
   data: T;
   /** The array's shape; `[]` for a scalar. */
   shape: number[];
   dtype: DtypeCode;
+  /** The `X-Array-Meta` JSON, when the response carries one. */
+  meta: M | null;
 }
 
 /** `"2162,2068"` → `[2162, 2068]`; `""` → `[]`. */
@@ -71,10 +75,10 @@ function canonical(name: string): string {
 }
 
 /** The array of a binary response: its body and headers. */
-export function decodeArray(
+export function decodeArray<M = unknown>(
   buffer: ArrayBuffer,
   headers: Headers | Record<string, string>,
-): WireArray {
+): WireArray<TypedArray, M> {
   const dtype = header(headers, DTYPE_HEADER);
   const shapeText = header(headers, SHAPE_HEADER);
   if (dtype === null || shapeText === null) {
@@ -90,12 +94,17 @@ export function decodeArray(
       `array body has ${buffer.byteLength} bytes, expected ${expected} for shape [${shape}] ${dtype}`,
     );
   }
-  return { data: new ctor(buffer), shape, dtype: dtype as DtypeCode };
+  const metaText = header(headers, META_HEADER);
+  const meta = metaText === null ? null : (JSON.parse(metaText) as M);
+  return { data: new ctor(buffer), shape, dtype: dtype as DtypeCode, meta };
 }
 
-/** Fetch a binary array endpoint. Rejects with an `ApiError` on a non-2xx answer. */
-export async function fetchArray(input: RequestInfo | URL, init?: RequestInit): Promise<WireArray> {
+/** Fetch a binary array endpoint. Rejects with an `ApiError` on a non-2xx answer. `M` types the meta. */
+export async function fetchArray<M = unknown>(
+  input: RequestInfo | URL,
+  init?: RequestInit,
+): Promise<WireArray<TypedArray, M>> {
   const response = await fetch(input, init);
   if (!response.ok) throw await errorFrom(response);
-  return decodeArray(await response.arrayBuffer(), response.headers);
+  return decodeArray<M>(await response.arrayBuffer(), response.headers);
 }

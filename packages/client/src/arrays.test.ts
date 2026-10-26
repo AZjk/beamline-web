@@ -58,6 +58,17 @@ describe("decodeArray", () => {
   });
 });
 
+test("the meta header is parsed, and absent when the response has none", () => {
+  const headers = new Headers({
+    "X-Array-Shape": "2",
+    "X-Array-Dtype": "f4",
+    "X-Array-Meta": '{"factor":3,"x0":1.0}',
+  });
+  const out = decodeArray<{ factor: number; x0: number }>(body([1, 2]), headers);
+  expect(out.meta).toEqual({ factor: 3, x0: 1 });
+  expect(decodeArray(body([1, 2]), { [SHAPE_HEADER]: "2", [DTYPE_HEADER]: "f4" }).meta).toBeNull();
+});
+
 test("parseShape", () => {
   expect(parseShape("2162,2068")).toEqual([2162, 2068]);
   expect(parseShape(" 4 ")).toEqual([4]);
