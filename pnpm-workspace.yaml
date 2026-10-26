@@ -5,3 +5,7 @@ packages:
 # dependencies allowed to run their install scripts (pnpm asks for every other one)
 allowBuilds:
   esbuild: true
+
+# supply-chain policy: a release has to be a day old before it is installed (pnpm's CI default,
+# made explicit so local installs resolve the same versions)
+minimumReleaseAge: 1440
