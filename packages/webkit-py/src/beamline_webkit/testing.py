@@ -16,7 +16,7 @@ from fastapi import FastAPI
 from numpy.typing import NDArray
 
 from .app import AppInfo, create_app
-from .arrays import ARRAY_MEDIA_TYPE, decode_array
+from .arrays import ARRAY_MEDIA_TYPE, array_meta, decode_array
 
 if TYPE_CHECKING:  # httpx is a test-only dependency
     from fastapi.testclient import TestClient
@@ -38,6 +38,11 @@ def array_of(response: Any) -> NDArray[Any]:
     return decode_array(response.content, response.headers)
 
 
+def meta_of(response: Any) -> dict[str, Any] | None:
+    """The ``X-Array-Meta`` of a binary response, None when it carries none."""
+    return array_meta(response.headers)
+
+
 @pytest.fixture
 def webkit_app() -> FastAPI:
     """A bare application from :func:`~beamline_webkit.app.create_app`, bound to loopback."""
@@ -49,4 +54,4 @@ def webkit_client(webkit_app: FastAPI) -> TestClient:
     return client_for(webkit_app)
 
 
-__all__ = ["array_of", "client_for", "np", "webkit_app", "webkit_client"]
+__all__ = ["array_of", "client_for", "meta_of", "np", "webkit_app", "webkit_client"]

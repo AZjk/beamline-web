@@ -88,7 +88,7 @@ def trusted_hosts(bind: str = "127.0.0.1") -> list[str] | None:
     return hosts
 
 
-def create_app(info: AppInfo, *, host: str = "127.0.0.1", docs: bool = True) -> FastAPI:
+def create_app(info: AppInfo, *, host: str = "127.0.0.1", docs: bool = True, lifespan: Any = None) -> FastAPI:
     """A FastAPI application with the shared conventions, ready for the tool's routes.
 
     Args:
@@ -96,6 +96,8 @@ def create_app(info: AppInfo, *, host: str = "127.0.0.1", docs: bool = True) -> 
         host: The address the server binds to; it decides the Host headers accepted
             (:func:`trusted_hosts`).
         docs: Serve the interactive docs at ``/api/docs`` and the document at ``/api/openapi.json``.
+        lifespan: FastAPI's lifespan context manager, for what to start and stop with the server
+            (a job manager, a process pool).
     """
     app = FastAPI(
         title=info.title,
@@ -103,6 +105,7 @@ def create_app(info: AppInfo, *, host: str = "127.0.0.1", docs: bool = True) -> 
         docs_url="/api/docs" if docs else None,
         redoc_url=None,
         openapi_url="/api/openapi.json" if docs else None,
+        lifespan=lifespan,
     )
     app.state.info = info
     hosts = trusted_hosts(host)

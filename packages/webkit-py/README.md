@@ -11,6 +11,9 @@ gixsu, pySimpleMask) is built on it, so the three services share one set of conv
 | Serving under a portal prefix       | `behind_prefix(app, "/xpcs")`, or `--prefix` on the command  |
 | Arrays as binary bodies             | `array_response(arr)` ↔ `decode_array(body, headers)`        |
 | The serve command                   | `add_serve_arguments(parser, port=...)` + `run_server(app)`  |
+| A little JSON beside a binary array | `array_response(arr, meta={...})` → the `X-Array-Meta` header   |
+| Long work with progress             | `JobManager`: `submit(fn)`, `GET /api/jobs/{id}/events` (SSE)   |
+| Per-browser state with a TTL        | `SessionStore` + `Depends(store.dependency())` → `Session`      |
 | The committed API document          | `export_openapi(app, path)`: deterministic, schema-versioned |
 | Test helpers                        | `beamline_webkit.testing`: `webkit_client`, `array_of`, …    |
 
@@ -22,7 +25,7 @@ tool keeps its Workspace, its router and its OpenAPI document.
 From the monorepo, at a tag:
 
 ```sh
-pip install "beamline-webkit @ git+https://github.com/AdvancedPhotonSource/beamline-web.git@webkit-py-v0.1.0#subdirectory=packages/webkit-py"
+pip install "beamline-webkit @ git+https://github.com/AdvancedPhotonSource/beamline-web.git@webkit-py-v0.2.0#subdirectory=packages/webkit-py"
 ```
 
 For development, from a checkout:

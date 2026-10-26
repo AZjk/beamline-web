@@ -74,3 +74,48 @@ def test_array_route(webkit_app):
     assert out.shape == (3, 2)
     assert out.dtype == np.int16
     assert out[0, 0] == 7
+
+
+def test_meta_travels_in_a_header(webkit_app):
+    from pydantic import BaseModel
+
+    from beamline_webkit import array_meta, array_responses
+    from beamline_webkit.arrays import META_HEADER, META_LIMIT, meta_header
+    from beamline_webkit.testing import meta_of
+
+    class Meta(BaseModel):
+        factor: int
+        zmin: float
+
+    @webkit_app.get("/api/with-dict")
+    def with_dict():
+        meta = {
+            "factor": np.int64(3),
+            "x0": np.float32(1.0),
+            "nan": float("nan"),
+            "label": "q=0.1 Å⁻¹",
+            "ok": np.bool_(True),
+        }
+        return array_response(np.zeros((2, 2), dtype=np.float32), meta=meta)
+
+    @webkit_app.get("/api/with-model")
+    def with_model():
+        return array_response(np.zeros(3, dtype=np.uint8), meta=Meta(factor=2, zmin=0.5))
+
+    @webkit_app.get("/api/without")
+    def without():
+        return array_response(np.zeros(3, dtype=np.uint8))
+
+    client = client_for(webkit_app)
+    answer = client.get("/api/with-dict")
+    assert answer.headers[META_HEADER].isascii()
+    assert meta_of(answer) == {"factor": 3, "x0": 1.0, "nan": None, "label": "q=0.1 Å⁻¹", "ok": True}
+    assert array_of(answer).shape == (2, 2)
+    assert meta_of(client.get("/api/with-model")) == {"factor": 2, "zmin": 0.5}
+    assert meta_of(client.get("/api/without")) is None
+    assert array_meta({}) is None
+    with pytest.raises(ValueError, match="bytes"):
+        meta_header({"big": "x" * META_LIMIT})
+    responses = array_responses("an image", meta="ImageMeta")
+    assert "ImageMeta" in responses[200]["headers"][META_HEADER]["description"]
+    assert "application/octet-stream" in responses[200]["content"]
