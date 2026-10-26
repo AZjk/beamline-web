@@ -7,10 +7,9 @@
  * pixel reported to the page, which reads the value from the array it holds.
  */
 
-import { DataToHtml, HeatmapMesh, ScaleType, type Domain } from "@h5web/lib";
+import { Annotation, HeatmapMesh, ScaleType, type Domain } from "@h5web/lib";
 import ndarray from "ndarray";
 import { useMemo, type ReactNode } from "react";
-import { Vector3 } from "three";
 
 import { h5webColorMap } from "../colormaps";
 import { ArrayImage, type ImageScale } from "./ArrayImage";
@@ -105,22 +104,21 @@ function Overlay({ overlay }: { overlay: LabelOverlay }) {
   );
 }
 
+/** A cross of fixed screen size at the beam center, placed in data coordinates. */
 function BeamCenter({ center }: { center: [number, number] }) {
-  const point = useMemo(() => [new Vector3(center[0], center[1], 0)] as [Vector3], [center]);
   return (
-    <DataToHtml points={point}>
-      {(pt) => (
-        <g aria-label="beam center" transform={`translate(${pt.x} ${pt.y})`}>
-          <path
-            d="M-9 0H9M0 -9V9"
-            stroke="rgba(0,0,0,0.55)"
-            strokeWidth="4"
-            strokeLinecap="round"
-          />
-          <path d="M-9 0H9M0 -9V9" stroke="#fff" strokeWidth="1.6" strokeLinecap="round" />
-        </g>
-      )}
-    </DataToHtml>
+    <Annotation x={center[0]} y={center[1]} center style={{ pointerEvents: "none" }}>
+      <svg
+        width="22"
+        height="22"
+        viewBox="-11 -11 22 22"
+        aria-label="beam center"
+        style={{ display: "block" }}
+      >
+        <path d="M-9 0H9M0 -9V9" stroke="rgba(0,0,0,0.55)" strokeWidth="4" strokeLinecap="round" />
+        <path d="M-9 0H9M0 -9V9" stroke="#fff" strokeWidth="1.6" strokeLinecap="round" />
+      </svg>
+    </Annotation>
   );
 }
 
@@ -163,14 +161,10 @@ export function DetectorImage({
       onLeave={onLeave}
       onClick={onClick}
       className={className}
-      svg={
-        <>
-          {beamCenter ? <BeamCenter center={beamCenter} /> : null}
-          {svg}
-        </>
-      }
+      svg={svg}
     >
       {overlay ? <Overlay overlay={overlay} /> : null}
+      {beamCenter ? <BeamCenter center={beamCenter} /> : null}
     </ArrayImage>
   );
 }
