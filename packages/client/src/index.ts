@@ -11,3 +11,9 @@ export {
 } from "./arrays";
 export type { DtypeCode, TypedArray, WireArray } from "./arrays";
 export { ApiError, errorFrom, fetchJson } from "./errors";
+export { apiUrl, createApi, filePath, pageBaseUrl, unwrap } from "./api";
+export type { ApiOptions } from "./api";
+export { SESSION_HEADER, newSessionId, resetSessionId, sessionHeaders, sessionId } from "./session";
+export { FINISHED, JobError, cancelJob, jobEventsUrl, runJob, watchJob } from "./jobs";
+export type { JobState, JobStatus, RunJobOptions } from "./jobs";
+export { createQueryClient } from "./query";

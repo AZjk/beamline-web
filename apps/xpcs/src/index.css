@@ -1,4 +1,6 @@
-@import "tailwindcss";
+/* Copyright © UChicago Argonne LLC
+   See LICENSE file for details */
+@import "@beamline-web/ui/styles.css";
 
 /* the kit's sources live in linked workspace packages, which Tailwind does not scan by default */
 @source "../../../packages/ui/src";

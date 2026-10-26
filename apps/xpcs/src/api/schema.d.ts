@@ -70,6 +70,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/files/{name}/g2/fit": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The page's fit of the file, matched to the g2 route's q values */
+        get: operations["g2_fit_of_file_api_files__name__g2_fit_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/files/{name}/g2/meta": {
         parameters: {
             query?: never;
@@ -326,8 +343,25 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** G2 Fit */
+        /** Fit the g2 of the files now, and answer with the result */
         post: operations["g2_fit_api_g2_fit_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/health": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Liveness and versions */
+        get: operations["health_api_health_get"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -362,6 +396,63 @@ export interface paths {
         put?: never;
         /** Intt */
         post: operations["intt_api_intt_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/jobs/{job_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The job's state */
+        get: operations["job_state_api_jobs__job_id__get"];
+        put?: never;
+        post?: never;
+        /** Cancel the job */
+        delete: operations["job_cancel_api_jobs__job_id__delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/jobs/{job_id}/events": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The job's states as Server-Sent Events, until it finishes */
+        get: operations["job_events_api_jobs__job_id__events_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/jobs/g2-fit": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Fit the g2 of the files as a job
+         * @description Starts the fit and answers with the job; follow it at /api/jobs/{id}/events, then
+         *     fetch the fits with /api/g2 or /api/files/{name}/g2/fit. The result names the files
+         *     fitted and those skipped.
+         */
+        post: operations["g2_fit_job_api_jobs_g2_fit_post"];
         delete?: never;
         options?: never;
         head?: never;
@@ -675,6 +766,23 @@ export interface components {
                 [key: string]: unknown;
             };
         };
+        /**
+         * Health
+         * @description The answer of ``GET /api/health``.
+         */
+        Health: {
+            /** Name */
+            name: string;
+            /** Schema Version */
+            schema_version: string;
+            /**
+             * Status
+             * @default ok
+             */
+            status: string;
+            /** Version */
+            version: string;
+        };
         /** HTTPValidationError */
         HTTPValidationError: {
             /** Detail */
@@ -873,6 +981,62 @@ export interface components {
              * @default 1
              */
             window: number;
+        };
+        /**
+         * JobState
+         * @description What a page sees of a job.
+         */
+        JobState: {
+            /** Created */
+            created: number;
+            /**
+             * Done
+             * @description steps done
+             * @default 0
+             */
+            done: number;
+            /**
+             * Error
+             * @description why it failed
+             */
+            error?: string | null;
+            /** Finished */
+            finished?: number | null;
+            /** Id */
+            id: string;
+            /**
+             * Message
+             * @description the step under way
+             */
+            message?: string | null;
+            /**
+             * Name
+             * @description what the job does, for the page's message bar
+             */
+            name: string;
+            /**
+             * Result
+             * @description what the job returned, once done
+             */
+            result?: unknown;
+            /**
+             * Session
+             * @description the session that started it
+             */
+            session?: string | null;
+            /** Started */
+            started?: number | null;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "queued" | "running" | "done" | "failed" | "cancelled";
+            /**
+             * Total
+             * @description steps in all; 0 while unknown
+             * @default 0
+             */
+            total: number;
         };
         /**
          * PackedArray
@@ -1302,6 +1466,42 @@ export interface operations {
                 };
                 content: {
                     "application/octet-stream": string;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    g2_fit_of_file_api_files__name__g2_fit_get: {
+        parameters: {
+            query?: {
+                q_max?: number | null;
+                q_min?: number | null;
+                t_max?: number | null;
+                t_min?: number | null;
+            };
+            header?: never;
+            path: {
+                name: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["G2Fit"] | null;
                 };
             };
             /** @description Validation Error */
@@ -1839,6 +2039,26 @@ export interface operations {
             };
         };
     };
+    health_api_health_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Health"];
+                };
+            };
+        };
+    };
     info_api_info_get: {
         parameters: {
             query?: never;
@@ -1879,6 +2099,132 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Intt"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    job_state_api_jobs__job_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                job_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["JobState"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    job_cancel_api_jobs__job_id__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                job_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["JobState"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    job_events_api_jobs__job_id__events_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                job_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description event: <status>, data: the JobState as JSON; one per change */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "text/event-stream": string;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    g2_fit_job_api_jobs_g2_fit_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["G2FitRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["JobState"];
                 };
             };
             /** @description Validation Error */

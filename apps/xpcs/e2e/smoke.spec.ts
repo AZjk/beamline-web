@@ -3,9 +3,8 @@
 
 import { expect, test } from "@playwright/test";
 
-test("the empty app loads and renders its shell", async ({ page }) => {
+test("the app loads its shell and reports the missing service", async ({ page }) => {
   await page.goto("/");
-  await expect(page.getByRole("heading", { name: "pyXPCSViewer web" })).toBeVisible();
-  await expect(page.getByTestId("connection")).toContainText("No service");
-  await expect(page.getByLabel("cursor readout")).toBeVisible();
+  await expect(page.getByText("XPCS")).toBeVisible();
+  await expect(page.getByText(/Could not reach the service/)).toBeVisible();
 });

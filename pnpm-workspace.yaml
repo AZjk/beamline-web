@@ -9,3 +9,10 @@ allowBuilds:
 # supply-chain policy: a release has to be a day old before it is installed (pnpm's CI default,
 # made explicit so local installs resolve the same versions)
 minimumReleaseAge: 1440
+
+# one React for every package, the one H5Web supports (Storybook's docs addon would pull a second)
+overrides:
+  react: 18.3.1
+  react-dom: 18.3.1
+  "@types/react": ^18.3.0
+  "@types/react-dom": ^18.3.0
