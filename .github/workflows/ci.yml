@@ -1,0 +1,82 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  web:
+    name: web (lint, typecheck, test, build, storybook, e2e)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4 # the version comes from packageManager in package.json
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - run: pnpm lint
+      - run: pnpm format:check
+      - run: pnpm typecheck
+      - run: pnpm test
+
+      - name: Generated types match the committed ones
+        run: |
+          pnpm gen:types
+          git diff --exit-code -- apps/*/src/api
+
+      - run: pnpm build
+      - run: pnpm build-storybook
+
+      - name: Playwright browser
+        run: pnpm --filter @beamline-web/app-xpcs exec playwright install --with-deps chromium
+
+      - run: pnpm e2e
+
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-report
+          path: apps/*/playwright-report
+          if-no-files-found: ignore
+
+  webkit-py:
+    name: webkit-py (ruff, mypy, pytest, install from git)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: packages/webkit-py
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: astral-sh/setup-uv@v6
+        with:
+          python-version: "3.12"
+
+      - run: uv sync --all-extras --locked
+      - run: uv run ruff check . && uv run ruff format --check .
+      - run: uv run mypy
+      - run: uv run pytest -ra
+
+      - name: Install the package from git and serve the health route behind a prefix
+        working-directory: ${{ github.workspace }}
+        run: |
+          uv venv /tmp/from-git
+          uv pip install --python /tmp/from-git/bin/python "beamline-webkit[test] @ git+file://${GITHUB_WORKSPACE}#subdirectory=packages/webkit-py"
+          /tmp/from-git/bin/python - <<'PY'
+          from beamline_webkit import AppInfo, behind_prefix, create_app
+          from beamline_webkit.testing import client_for
+
+          app = behind_prefix(create_app(AppInfo(name="t", title="t", version="0", schema_version="0.1.0")), "/t")
+          answer = client_for(app).get("/t/api/health")
+          assert answer.status_code == 200 and answer.json()["status"] == "ok", answer.text
+          print("health behind /t:", answer.json())
+          PY
