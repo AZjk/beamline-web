@@ -1,0 +1,12 @@
+// Copyright © UChicago Argonne LLC
+// See LICENSE file for details
+
+import type { Preview } from "@storybook/react-vite";
+
+const preview: Preview = {
+  parameters: {
+    controls: { matchers: { color: /(background|color)$/i } },
+  },
+};
+
+export default preview;

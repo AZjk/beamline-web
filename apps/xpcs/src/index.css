@@ -1,0 +1,5 @@
+@import "tailwindcss";
+
+/* the kit's sources live in linked workspace packages, which Tailwind does not scan by default */
+@source "../../../packages/ui/src";
+@source "../../../packages/viz/src";

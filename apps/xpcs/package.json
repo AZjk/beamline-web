@@ -1,0 +1,42 @@
+{
+  "name": "@beamline-web/app-xpcs",
+  "version": "0.0.0",
+  "private": true,
+  "description": "The pyXpcsViewer web app: its tabs and panels on the kit (Phase 1); the empty app for now",
+  "type": "module",
+  "tool": {
+    "name": "xpcs-viewer",
+    "repository": "https://github.com/AdvancedPhotonSource/pyXpcsViewer",
+    "ref": "web",
+    "openapi": "src/pyxpcsviewer/web/openapi.json"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview --host 127.0.0.1 --port 4381 --strictPort",
+    "typecheck": "tsc -p tsconfig.json",
+    "test": "vitest run",
+    "e2e": "playwright test"
+  },
+  "dependencies": {
+    "@beamline-web/client": "workspace:*",
+    "@beamline-web/ui": "workspace:*",
+    "@beamline-web/viz": "workspace:*",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.64.1",
+    "@tailwindcss/vite": "^4.3.3",
+    "@testing-library/react": "^16.3.3",
+    "@types/node": "^26.6.5",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@vitejs/plugin-react": "^6.1.2",
+    "jsdom": "^30.1.3",
+    "tailwindcss": "^4.3.3",
+    "typescript": "^5.9.3",
+    "vite": "^8.3.5",
+    "vitest": "^5.0.5"
+  }
+}
