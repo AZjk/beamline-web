@@ -87,7 +87,7 @@ Tag the monorepo as `webkit-py-vX.Y.Z` after bumping `packages/webkit-py/pyproje
 is on PyPI, tools install it from the tag:
 
 ```sh
-pip install "beamline-webkit @ git+https://github.com/AdvancedPhotonSource/beamline-web.git@webkit-py-v0.2.0#subdirectory=packages/webkit-py"
+pip install "beamline-webkit @ git+https://github.com/AZjk/beamline-web.git@webkit-py-v0.2.0#subdirectory=packages/webkit-py"
 ```
 
 The tool repositories' CI workflows carry that line as `WEBKIT_SPEC`.

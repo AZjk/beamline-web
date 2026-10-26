@@ -25,7 +25,7 @@ tool keeps its Workspace, its router and its OpenAPI document.
 From the monorepo, at a tag:
 
 ```sh
-pip install "beamline-webkit @ git+https://github.com/AdvancedPhotonSource/beamline-web.git@webkit-py-v0.2.0#subdirectory=packages/webkit-py"
+pip install "beamline-webkit @ git+https://github.com/AZjk/beamline-web.git@webkit-py-v0.2.0#subdirectory=packages/webkit-py"
 ```
 
 For development, from a checkout:
