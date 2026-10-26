@@ -1,0 +1,161 @@
+// Copyright © UChicago Argonne LLC
+// See LICENSE file for details
+
+/**
+ * A 2-D array as an image on the GPU (H5Web over react-three-fiber): the color map, the scale
+ * and the levels apply in the browser, pan and zoom run at the frame rate, and overlays draw
+ * in data coordinates. The detector image and the two-time map are built on it.
+ */
+
+import {
+  ColorBar,
+  DefaultInteractions,
+  HeatmapMesh,
+  ResetZoomButton,
+  ScaleType,
+  SvgElement,
+  VisCanvas,
+  useCanvasEvent,
+  type AxisConfig,
+  type ColorMap,
+  type Domain,
+  type VisScaleType,
+} from "@h5web/lib";
+import ndarray from "ndarray";
+import { useMemo, type ReactNode } from "react";
+
+export type ImageScale = "linear" | "log" | "symlog" | "sqrt";
+
+const SCALE: Record<ImageScale, VisScaleType> = {
+  linear: ScaleType.Linear,
+  log: ScaleType.Log,
+  symlog: ScaleType.SymLog,
+  sqrt: ScaleType.Sqrt,
+};
+
+export interface ImageExtent {
+  /** The data coordinates of the array's outer edges. */
+  xmin: number;
+  xmax: number;
+  ymin: number;
+  ymax: number;
+}
+
+export interface ArrayImageProps {
+  /** Row-major values, `rows` × `cols`. */
+  data: Float32Array | Uint8Array | Uint16Array;
+  rows: number;
+  cols: number;
+  /** Where the array sits in data coordinates (axis values at its edges). */
+  extent: ImageExtent;
+  xLabel?: string;
+  yLabel?: string;
+  /** The color levels; the array's own range when undefined. */
+  domain: Domain | undefined;
+  scale?: ImageScale;
+  colorMap: ColorMap;
+  invertColorMap?: boolean;
+  /** Equal data units on both axes (a detector), or fill the area. */
+  aspect?: "equal" | "auto";
+  showColorBar?: boolean;
+  colorBarLabel?: string;
+  /** Further meshes inside the canvas (overlays in data coordinates). */
+  children?: ReactNode;
+  /** SVG drawn in data coordinates over the image. */
+  svg?: ReactNode;
+  onHover?: (x: number, y: number) => void;
+  onLeave?: () => void;
+  onClick?: (x: number, y: number) => void;
+  className?: string;
+}
+
+/** Pointer events of the canvas in data coordinates. */
+function CanvasEvents({
+  onHover,
+  onLeave,
+  onClick,
+}: Pick<ArrayImageProps, "onHover" | "onLeave" | "onClick">) {
+  useCanvasEvent("pointermove", (event) => onHover?.(event.dataPt.x, event.dataPt.y));
+  useCanvasEvent("pointerleave", () => onLeave?.());
+  useCanvasEvent("click", (event) => onClick?.(event.dataPt.x, event.dataPt.y));
+  return null;
+}
+
+/** The array's values as the GPU reads them: float32 or 8/16-bit unsigned, rows × cols. */
+export function toNdArray(
+  data: Float32Array | Uint8Array | Uint16Array,
+  rows: number,
+  cols: number,
+) {
+  return ndarray(data, [rows, cols]);
+}
+
+export function ArrayImage({
+  data,
+  rows,
+  cols,
+  extent,
+  xLabel,
+  yLabel,
+  domain,
+  scale = "linear",
+  colorMap,
+  invertColorMap = false,
+  aspect = "equal",
+  showColorBar = true,
+  colorBarLabel,
+  children,
+  svg,
+  onHover,
+  onLeave,
+  onClick,
+  className,
+}: ArrayImageProps) {
+  const values = useMemo(() => toNdArray(data, rows, cols), [data, rows, cols]);
+  const abscissa: AxisConfig = useMemo(
+    () => ({ visDomain: [extent.xmin, extent.xmax], label: xLabel, showGrid: false, nice: false }),
+    [extent.xmin, extent.xmax, xLabel],
+  );
+  const ordinate: AxisConfig = useMemo(
+    () => ({ visDomain: [extent.ymin, extent.ymax], label: yLabel, showGrid: false, nice: false }),
+    [extent.ymin, extent.ymax, yLabel],
+  );
+  const safeDomain: Domain = domain && domain[0] < domain[1] ? domain : [0, 1];
+  return (
+    <div className={className ?? "flex h-full min-h-0 w-full"}>
+      <div className="relative min-h-0 min-w-0 flex-1">
+        <VisCanvas abscissaConfig={abscissa} ordinateConfig={ordinate} aspect={aspect}>
+          <DefaultInteractions />
+          <ResetZoomButton />
+          <HeatmapMesh
+            values={values}
+            domain={safeDomain}
+            scaleType={SCALE[scale]}
+            colorMap={colorMap}
+            invertColorMap={invertColorMap}
+          />
+          {children}
+          {svg ? <SvgElement>{svg}</SvgElement> : null}
+          <CanvasEvents onHover={onHover} onLeave={onLeave} onClick={onClick} />
+        </VisCanvas>
+      </div>
+      {showColorBar ? (
+        <div
+          className="flex shrink-0 flex-col items-center text-2xs text-muted"
+          aria-label="color bar"
+        >
+          {colorBarLabel ? <span className="py-1">{colorBarLabel}</span> : null}
+          <div className="min-h-0 flex-1">
+            <ColorBar
+              domain={safeDomain}
+              scaleType={SCALE[scale]}
+              colorMap={colorMap}
+              invertColorMap={invertColorMap}
+              withBounds
+            />
+          </div>
+        </div>
+      ) : null}
+    </div>
+  );
+}

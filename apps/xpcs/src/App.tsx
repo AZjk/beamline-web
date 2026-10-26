@@ -2,12 +2,22 @@
 // See LICENSE file for details
 
 import { ApiError, createQueryClient } from "@beamline-web/client";
-import { AppShell, Placeholder, Tabs, useShortcuts, useStale } from "@beamline-web/ui";
+import {
+  AppShell,
+  Pane,
+  PaneGroup,
+  PaneHandle,
+  Placeholder,
+  Tabs,
+  useShortcuts,
+  useStale,
+} from "@beamline-web/ui";
 import { QueryClientProvider, type QueryClient } from "@tanstack/react-query";
 import { useEffect, useMemo, useState } from "react";
 
 import { useInfo } from "./api/queries";
 import { FilesPane } from "./files/FilesPane";
+import { ImagePane } from "./image/ImagePane";
 import { registry } from "./plugins";
 import { labelOf, useAppStore } from "./store";
 import { useUrlState } from "./urlState";
@@ -125,9 +135,22 @@ function Page() {
       storageKey="xpcs:shell"
       left={<FilesPane onListed={() => setListed(true)} />}
       center={
-        <Placeholder>
-          The detector image and its panels arrive with the next step of Phase 1.
-        </Placeholder>
+        <PaneGroup
+          orientation="vertical"
+          storageKey="xpcs:center"
+          panelIds={["image", "panels"]}
+          className="h-full p-1.5"
+        >
+          <Pane id="image" defaultSize={58} minSize={25}>
+            <ImagePane />
+          </Pane>
+          <PaneHandle orientation="vertical" className="my-1.5 bg-transparent" />
+          <Pane id="panels" defaultSize={42} minSize={15}>
+            <Placeholder>
+              The I(q) and I(t) panels arrive with the next step of Phase 1.
+            </Placeholder>
+          </Pane>
+        </PaneGroup>
       }
       right={<AnalysisTabs />}
     />

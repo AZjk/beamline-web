@@ -211,6 +211,9 @@ importers:
       '@beamline-web/viz':
         specifier: workspace:*
         version: link:../../packages/viz
+      '@h5web/lib':
+        specifier: 18.0.0
+        version: 18.0.0(@react-three/fiber@8.18.0(@types/react@18.3.31)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(three@0.170.0))(@types/react-dom@18.3.7(@types/react@18.3.31))(@types/react@18.3.31)(@types/three@0.170.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(three@0.170.0)(typescript@5.9.3)(use-sync-external-store@1.7.0(react@18.3.1))
       '@tanstack/react-query':
         specifier: ^5.90.0
         version: 5.104.5(@types/react@18.3.31)(react@18.3.1)
