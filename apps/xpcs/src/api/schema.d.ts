@@ -53,6 +53,43 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/files/{name}/g2/data": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** G2 Data */
+        get: operations["g2_data_api_files__name__g2_data_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/files/{name}/g2/meta": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * G2 Meta
+         * @description The q values, labels and delays of the binary g2 route, without the array.
+         */
+        get: operations["g2_meta_api_files__name__g2_meta_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/files/{name}/hdf": {
         parameters: {
             query?: never;
@@ -79,6 +116,43 @@ export interface paths {
         };
         /** Image */
         get: operations["image_api_files__name__image_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/files/{name}/image/data": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Image Data */
+        get: operations["image_data_api_files__name__image_data_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/files/{name}/image/meta": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Image Meta
+         * @description What the binary image route sends for these parameters, without the array.
+         */
+        get: operations["image_meta_api_files__name__image_meta_get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -181,6 +255,43 @@ export interface paths {
         };
         /** Twotime C2 */
         get: operations["twotime_c2_api_files__name__twotime_c2_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/files/{name}/twotime/c2/data": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Twotime C2 Data */
+        get: operations["twotime_c2_data_api_files__name__twotime_c2_data_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/files/{name}/twotime/c2/meta": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Twotime C2 Meta
+         * @description What the binary two-time route sends for these parameters, without the array.
+         */
+        get: operations["twotime_c2_meta_api_files__name__twotime_c2_meta_get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -295,6 +406,156 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /**
+         * C2Meta
+         * @description What describes the array of the binary two-time route (its ``X-Array-Meta`` header).
+         */
+        C2Meta: {
+            /** Acquire Period */
+            acquire_period: number;
+            /** Bin Label */
+            bin_label: string;
+            /**
+             * Delta T
+             * @description seconds per C2 pixel
+             */
+            delta_t: number;
+            /** File */
+            file: string;
+            /** Label */
+            label: string;
+            /** Qbin */
+            qbin: number;
+            /** Selection */
+            selection: number;
+            /** Zmax */
+            zmax: number;
+            /** Zmin */
+            zmin: number;
+        };
+        /**
+         * Colormaps
+         * @description Plotly color scales by name: ``[[position, "rgb(r,g,b)"], ...]``.
+         */
+        Colormaps: {
+            [key: string]: [
+                number,
+                string
+            ][];
+        };
+        /**
+         * Defaults
+         * @description The Qt viewer's fit bounds, offered to the page as a starting point: ``[lower, upper]``.
+         */
+        Defaults: {
+            /**
+             * G2 Bounds
+             * @description by fit function: single, double
+             */
+            g2_bounds: {
+                [key: string]: number[][];
+            };
+            /** Tauq Bounds */
+            tauq_bounds: number[][];
+        };
+        /** FileRow */
+        FileRow: {
+            /**
+             * Atype
+             * @description Multitau, Twotime or both; null for a file that is not a result
+             */
+            atype: string[] | null;
+            /**
+             * Id
+             * @description the file name, the key of every per-file route
+             */
+            id: string;
+            /**
+             * Label
+             * @description the short label
+             */
+            label: string;
+            /**
+             * Modified
+             * @description the modification time, YYYY-MM-DD HH:MM
+             */
+            modified: string;
+            /** Mtime */
+            mtime: number;
+            /** Size */
+            size: number;
+        };
+        /** Files */
+        Files: {
+            /** Files */
+            files: components["schemas"]["FileRow"][];
+            /**
+             * Total
+             * @description files matching the pattern before the limit
+             */
+            total: number;
+            /**
+             * Version
+             * @description bumped at every rescan of the folder
+             */
+            version: number;
+        };
+        /** G2 */
+        G2: {
+            /** Files */
+            files: components["schemas"]["G2File"][];
+            /** Skipped */
+            skipped: components["schemas"]["Skipped"][];
+        };
+        /** G2File */
+        G2File: {
+            err: components["schemas"]["PackedArray"];
+            /** File */
+            file: string;
+            fit: components["schemas"]["G2Fit"] | null;
+            /** @description shape (delays, q-bins) */
+            g2: components["schemas"]["PackedArray"];
+            /** Label */
+            label: string;
+            /** Labels */
+            labels: string[];
+            /** Q */
+            q: number[];
+            t: components["schemas"]["PackedArray"];
+        };
+        /** G2Fit */
+        G2Fit: {
+            /** Bounds */
+            bounds: number[][] | null;
+            /** Errors */
+            errors: ((number | null)[] | null)[];
+            /** Fit Flag */
+            fit_flag: boolean[];
+            fit_x: components["schemas"]["PackedArray"];
+            /** @description shape (q-bins, points); NaN rows for bins without a fit */
+            fit_y: components["schemas"]["PackedArray"];
+            /**
+             * Func
+             * @enum {string}
+             */
+            func: "single" | "double";
+            /** Param Names */
+            param_names: string[];
+            /** Params */
+            params: ((number | null)[] | null)[];
+            /** Q Range */
+            q_range: [
+                number,
+                number
+            ] | null;
+            /** Success */
+            success: boolean[];
+            /** T Range */
+            t_range: [
+                number,
+                number
+            ] | null;
+        };
         /** G2FitRequest */
         G2FitRequest: {
             /** Bounds */
@@ -316,6 +577,25 @@ export interface components {
             /** T Range */
             t_range?: number[] | null;
         };
+        /**
+         * G2Meta
+         * @description What describes the array of the binary g2 route, shape (2, delays, q-bins): g2 and its error.
+         */
+        G2Meta: {
+            /** File */
+            file: string;
+            /** Label */
+            label: string;
+            /** Labels */
+            labels: string[];
+            /** Q */
+            q: number[];
+            /**
+             * T
+             * @description the delays, seconds
+             */
+            t: number[];
+        };
         /** G2Request */
         G2Request: {
             /**
@@ -333,10 +613,243 @@ export interface components {
              */
             with_fit: boolean;
         };
+        /** G2Stability */
+        G2Stability: {
+            err: components["schemas"]["PackedArray"];
+            /** File */
+            file: string;
+            /** @description shape (segments, delays, q-bins) */
+            g2: components["schemas"]["PackedArray"];
+            /** Label */
+            label: string;
+            /** Labels */
+            labels: string[];
+            /** Q */
+            q: number[];
+            /** Segments */
+            segments: string[];
+            t: components["schemas"]["PackedArray"];
+        };
+        /**
+         * Geometry
+         * @description The detector geometry of a file: what a page needs to place its image in q.
+         */
+        Geometry: {
+            /**
+             * Beam Center
+             * @description x, y in detector pixels
+             */
+            beam_center: [
+                number,
+                number
+            ];
+            /** Det Dist */
+            det_dist: number;
+            /** Energy */
+            energy: number;
+            /**
+             * Extent Q
+             * @description qx min, qx max, qy min, qy max at the detector edges
+             */
+            extent_q: number[];
+            /** Pixel Size */
+            pixel_size: number;
+            /**
+             * Shape
+             * @description rows, columns of the detector
+             */
+            shape: [
+                number,
+                number
+            ];
+        };
+        /** HdfInfo */
+        HdfInfo: {
+            /** File */
+            file: string;
+            /**
+             * Groups
+             * @description the instrument, sample, user and analysis groups, nested
+             */
+            groups: {
+                [key: string]: unknown;
+            };
+        };
         /** HTTPValidationError */
         HTTPValidationError: {
             /** Detail */
             detail?: components["schemas"]["ValidationError"][];
+        };
+        /** Image */
+        Image: {
+            /**
+             * Beam Center
+             * @description x, y in detector pixels
+             */
+            beam_center: [
+                number,
+                number
+            ];
+            /** Det Dist */
+            det_dist: number;
+            /** Energy */
+            energy: number;
+            /**
+             * Extent Q
+             * @description the q range of the detector edges
+             */
+            extent_q: number[];
+            /**
+             * Factor
+             * @description source pixels per sent pixel, per axis
+             */
+            factor: number;
+            /** File */
+            file: string;
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "saxs" | "dqmap" | "sqmap" | "mask";
+            /** Label */
+            label: string;
+            /** @description the percentile table of z: 201 values */
+            levels: components["schemas"]["PackedArray"];
+            /** Pixel Size */
+            pixel_size: number;
+            /**
+             * Scale
+             * @enum {string}
+             */
+            scale: "log" | "linear";
+            /**
+             * Shape
+             * @description rows, columns of the array sent
+             */
+            shape: [
+                number,
+                number
+            ];
+            /**
+             * Shape Full
+             * @description rows, columns of the detector
+             */
+            shape_full: [
+                number,
+                number
+            ];
+            /**
+             * X0
+             * @description center of the first sent column, in source pixels
+             */
+            x0: number;
+            /** Y0 */
+            y0: number;
+            z: components["schemas"]["PackedArray"];
+            /** Zmax */
+            zmax: number;
+            /** Zmin */
+            zmin: number;
+        };
+        /**
+         * ImageMeta
+         * @description What describes the array of the binary image route (its ``X-Array-Meta`` header).
+         */
+        ImageMeta: {
+            /**
+             * Factor
+             * @description source pixels per sent pixel, per axis
+             */
+            factor: number;
+            /** File */
+            file: string;
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "saxs" | "dqmap" | "sqmap" | "mask";
+            /** Label */
+            label: string;
+            /**
+             * Scale
+             * @enum {string}
+             */
+            scale: "log" | "linear";
+            /**
+             * Shape Full
+             * @description rows, columns of the detector
+             */
+            shape_full: [
+                number,
+                number
+            ];
+            /**
+             * X0
+             * @description center of the first sent column, in detector pixels
+             */
+            x0: number;
+            /**
+             * Y0
+             * @description center of the first sent row, in detector pixels
+             */
+            y0: number;
+            /**
+             * Zmax
+             * @description the 99.9th percentile
+             */
+            zmax: number;
+            /**
+             * Zmin
+             * @description the 1st percentile of an intensity image: a first color range
+             */
+            zmin: number;
+        };
+        /** Info */
+        Info: {
+            /** Colormaps */
+            colormaps: string[];
+            defaults: components["schemas"]["Defaults"];
+            /** Label Style */
+            label_style: string | null;
+            /**
+             * Root
+             * @description the folder served
+             */
+            root: string;
+            /**
+             * Schema Version
+             * @description the API schema version; a frontend refuses a different major
+             */
+            schema_version: string;
+            /**
+             * Version
+             * @description the xpcs-viewer package version
+             */
+            version: string;
+        };
+        /** Intt */
+        Intt: {
+            /** Files */
+            files: components["schemas"]["InttFile"][];
+            /** Skipped */
+            skipped: components["schemas"]["Skipped"][];
+        };
+        /** InttFile */
+        InttFile: {
+            fft_x: components["schemas"]["PackedArray"];
+            fft_y: components["schemas"]["PackedArray"];
+            /** File */
+            file: string;
+            /** Frame Time */
+            frame_time: number;
+            /** Frames */
+            frames: number;
+            /** Label */
+            label: string;
+            /** Points */
+            points: number;
+            x: components["schemas"]["PackedArray"];
+            y: components["schemas"]["PackedArray"];
         };
         /** InttRequest */
         InttRequest: {
@@ -360,6 +873,92 @@ export interface components {
              * @default 1
              */
             window: number;
+        };
+        /**
+         * PackedArray
+         * @description A typed array as base64: ``dtype`` is the code the browser maps to a typed array
+         *     (``f4`` Float32Array, ``u1`` Uint8Array, …), ``bdata`` its little-endian bytes.
+         */
+        PackedArray: {
+            /** Bdata */
+            bdata: string;
+            /**
+             * Dtype
+             * @enum {string}
+             */
+            dtype: "f4" | "f8" | "i1" | "u1" | "i2" | "u2" | "i4" | "u4";
+            /** Shape */
+            shape: number[];
+        };
+        /** ParamsVsQ */
+        ParamsVsQ: {
+            /** Bounds */
+            bounds: number[][] | null;
+            /** Errors */
+            errors: (number | null)[][];
+            /** Names */
+            names: string[];
+            /** Q */
+            q: number[];
+            /** Titles */
+            titles: string[];
+            /**
+             * Values
+             * @description one row per parameter
+             */
+            values: (number | null)[][];
+        };
+        /**
+         * Pixel
+         * @description What is at a detector pixel; only ``x``, ``y`` and ``on_detector`` off the detector.
+         */
+        Pixel: {
+            /** Dq Bin */
+            dq_bin?: number | null;
+            /** Dq Label */
+            dq_label?: string | null;
+            /** Intensity */
+            intensity?: number | null;
+            /** Masked */
+            masked?: boolean | null;
+            /** On Detector */
+            on_detector: boolean;
+            /** Phi */
+            phi?: number | null;
+            /** Q */
+            q?: number | null;
+            /** Qx */
+            qx?: number | null;
+            /** Qy */
+            qy?: number | null;
+            /** Sq Bin */
+            sq_bin?: number | null;
+            /** X */
+            x: number;
+            /** Y */
+            y: number;
+        };
+        /** Saxs1d */
+        Saxs1d: {
+            /** Files */
+            files: components["schemas"]["Saxs1dFile"][];
+            /** Skipped */
+            skipped: components["schemas"]["Skipped"][];
+        };
+        /** Saxs1dFile */
+        Saxs1dFile: {
+            /** File */
+            file: string;
+            I: components["schemas"]["PackedArray"];
+            /** Label */
+            label: string;
+            /** Labels */
+            labels: string[];
+            q: components["schemas"]["PackedArray"];
+            /** Xlabel */
+            xlabel: string;
+            /** Ylabel */
+            ylabel: string;
         };
         /** Saxs1dRequest */
         Saxs1dRequest: {
@@ -398,6 +997,81 @@ export interface components {
              */
             sampling: number;
         };
+        /** Skipped */
+        Skipped: {
+            /** File */
+            file: string;
+            /** Reason */
+            reason: string;
+        };
+        /** Stability */
+        Stability: {
+            /** File */
+            file: string;
+            I: components["schemas"]["PackedArray"];
+            /** Label */
+            label: string;
+            /** Labels */
+            labels: string[];
+            q: components["schemas"]["PackedArray"];
+            /** Xlabel */
+            xlabel: string;
+            /** Ylabel */
+            ylabel: string;
+        };
+        /** Summary */
+        Summary: {
+            /** File */
+            file: string;
+            geometry: components["schemas"]["Geometry"];
+            /** Label */
+            label: string;
+            /**
+             * Rows
+             * @description [label, value] rows of the metadata card
+             */
+            rows: [
+                string,
+                string
+            ][];
+        };
+        /** Tauq */
+        Tauq: {
+            /** Files */
+            files: components["schemas"]["TauqFile"][];
+            /** Skipped */
+            skipped: components["schemas"]["Skipped"][];
+        };
+        /** TauqFile */
+        TauqFile: {
+            /** File */
+            file: string;
+            fit: components["schemas"]["TauqFit"] | null;
+            /** Label */
+            label: string;
+            params_vs_q: components["schemas"]["ParamsVsQ"];
+            /** Q */
+            q: number[];
+            /** Tau */
+            tau: number[];
+            /** Tau Err */
+            tau_err: number[];
+        };
+        /** TauqFit */
+        TauqFit: {
+            /** A */
+            a: number | null;
+            /** A Err */
+            a_err: number | null;
+            /** B */
+            b: number | null;
+            /** B Err */
+            b_err: number | null;
+            /** X */
+            x: number[];
+            /** Y */
+            y: number[];
+        };
         /** TauqRequest */
         TauqRequest: {
             /** Bounds */
@@ -416,6 +1090,75 @@ export interface components {
             names?: string[];
             /** Q Range */
             q_range?: number[] | null;
+        };
+        /** TwotimeBin */
+        TwotimeBin: {
+            /**
+             * Index
+             * @description the C2 block index: the selection of the c2 route
+             */
+            index: number;
+            /** Label */
+            label: string;
+            /** Qbin */
+            qbin: number;
+        };
+        /** TwotimeBinAt */
+        TwotimeBinAt: {
+            /** Qbin */
+            qbin: number;
+            /**
+             * Selection
+             * @description the C2 block index at the pixel, null off every bin
+             */
+            selection: number | null;
+            /** X */
+            x: number;
+            /** Y */
+            y: number;
+        };
+        /** TwotimeBins */
+        TwotimeBins: {
+            /** Bins */
+            bins: components["schemas"]["TwotimeBin"][];
+            /** File */
+            file: string;
+            /** Label */
+            label: string;
+            /** Time Step */
+            time_step: number;
+        };
+        /** TwotimeC2 */
+        TwotimeC2: {
+            /** Acquire Period */
+            acquire_period: number;
+            /** Bin Label */
+            bin_label: string;
+            /** @description null when include_c2 is false: fetch the binary route */
+            c2: components["schemas"]["PackedArray"] | null;
+            /** Delta T */
+            delta_t: number;
+            /** File */
+            file: string;
+            g2_full: components["schemas"]["PackedArray"];
+            /** @description shape (segments, delays) */
+            g2_partial: components["schemas"]["PackedArray"];
+            /** Label */
+            label: string;
+            levels: components["schemas"]["PackedArray"];
+            /** Qbin */
+            qbin: number;
+            /** Selection */
+            selection: number;
+            /** Shape */
+            shape: [
+                number,
+                number
+            ];
+            /** Zmax */
+            zmax: number;
+            /** Zmin */
+            zmin: number;
         };
         /** ValidationError */
         ValidationError: {
@@ -454,9 +1197,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": {
-                        [key: string]: unknown;
-                    };
+                    "application/json": components["schemas"]["Colormaps"];
                 };
             };
         };
@@ -482,9 +1223,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": {
-                        [key: string]: unknown;
-                    };
+                    "application/json": components["schemas"]["Files"];
                 };
             };
             /** @description Validation Error */
@@ -520,9 +1259,85 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": {
-                        [key: string]: unknown;
-                    };
+                    "application/json": components["schemas"]["G2Stability"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    g2_data_api_files__name__g2_data_get: {
+        parameters: {
+            query?: {
+                q_max?: number | null;
+                q_min?: number | null;
+                t_max?: number | null;
+                t_min?: number | null;
+            };
+            header?: never;
+            path: {
+                name: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description the g2 and its error as float32, shape (2, delays, q-bins) */
+            200: {
+                headers: {
+                    /** @description the element type: f4, f8, i1, u1, i2, u2, i4, u4, i8 or u8, little-endian */
+                    "X-Array-Dtype"?: string;
+                    /** @description JSON describing the array, the shape of G2Meta */
+                    "X-Array-Meta"?: string;
+                    /** @description the array's shape, comma-separated */
+                    "X-Array-Shape"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/octet-stream": string;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    g2_meta_api_files__name__g2_meta_get: {
+        parameters: {
+            query?: {
+                q_max?: number | null;
+                q_min?: number | null;
+                t_max?: number | null;
+                t_min?: number | null;
+            };
+            header?: never;
+            path: {
+                name: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["G2Meta"];
                 };
             };
             /** @description Validation Error */
@@ -553,9 +1368,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": {
-                        [key: string]: unknown;
-                    };
+                    "application/json": components["schemas"]["HdfInfo"];
                 };
             };
             /** @description Validation Error */
@@ -590,9 +1403,87 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": {
-                        [key: string]: unknown;
-                    };
+                    "application/json": components["schemas"]["Image"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    image_data_api_files__name__image_data_get: {
+        parameters: {
+            query?: {
+                kind?: string;
+                max_size?: number;
+                scale?: string;
+                x_max?: number | null;
+                x_min?: number | null;
+                y_max?: number | null;
+                y_min?: number | null;
+            };
+            header?: never;
+            path: {
+                name: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description the map as float32 rows (uint8 for the mask), downsampled to max_size or, with max_size=0, at full resolution; x_min … y_max cut it to a region of the detector */
+            200: {
+                headers: {
+                    /** @description the element type: f4, f8, i1, u1, i2, u2, i4, u4, i8 or u8, little-endian */
+                    "X-Array-Dtype"?: string;
+                    /** @description JSON describing the array, the shape of ImageMeta */
+                    "X-Array-Meta"?: string;
+                    /** @description the array's shape, comma-separated */
+                    "X-Array-Shape"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/octet-stream": string;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    image_meta_api_files__name__image_meta_get: {
+        parameters: {
+            query?: {
+                kind?: string;
+                max_size?: number;
+                scale?: string;
+            };
+            header?: never;
+            path: {
+                name: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ImageMeta"];
                 };
             };
             /** @description Validation Error */
@@ -626,9 +1517,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": {
-                        [key: string]: unknown;
-                    };
+                    "application/json": components["schemas"]["Pixel"];
                 };
             };
             /** @description Validation Error */
@@ -661,9 +1550,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": {
-                        [key: string]: unknown;
-                    };
+                    "application/json": components["schemas"]["Stability"];
                 };
             };
             /** @description Validation Error */
@@ -694,9 +1581,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": {
-                        [key: string]: unknown;
-                    };
+                    "application/json": components["schemas"]["Summary"];
                 };
             };
             /** @description Validation Error */
@@ -730,9 +1615,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": {
-                        [key: string]: unknown;
-                    };
+                    "application/json": components["schemas"]["TwotimeBinAt"];
                 };
             };
             /** @description Validation Error */
@@ -763,9 +1646,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": {
-                        [key: string]: unknown;
-                    };
+                    "application/json": components["schemas"]["TwotimeBins"];
                 };
             };
             /** @description Validation Error */
@@ -780,6 +1661,84 @@ export interface operations {
         };
     };
     twotime_c2_api_files__name__twotime_c2_get: {
+        parameters: {
+            query?: {
+                correct_diag?: boolean;
+                /** @description false: leave the map out, the binary route has it */
+                include_c2?: boolean;
+                max_size?: number;
+                selection?: number;
+            };
+            header?: never;
+            path: {
+                name: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TwotimeC2"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    twotime_c2_data_api_files__name__twotime_c2_data_get: {
+        parameters: {
+            query?: {
+                correct_diag?: boolean;
+                max_size?: number;
+                selection?: number;
+            };
+            header?: never;
+            path: {
+                name: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description the two-time correlation map of one q-bin as float32 */
+            200: {
+                headers: {
+                    /** @description the element type: f4, f8, i1, u1, i2, u2, i4, u4, i8 or u8, little-endian */
+                    "X-Array-Dtype"?: string;
+                    /** @description JSON describing the array, the shape of C2Meta */
+                    "X-Array-Meta"?: string;
+                    /** @description the array's shape, comma-separated */
+                    "X-Array-Shape"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/octet-stream": string;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    twotime_c2_meta_api_files__name__twotime_c2_meta_get: {
         parameters: {
             query?: {
                 correct_diag?: boolean;
@@ -800,9 +1759,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": {
-                        [key: string]: unknown;
-                    };
+                    "application/json": components["schemas"]["C2Meta"];
                 };
             };
             /** @description Validation Error */
@@ -835,9 +1792,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": {
-                        [key: string]: unknown;
-                    };
+                    "application/json": components["schemas"]["G2"];
                 };
             };
             /** @description Validation Error */
@@ -870,9 +1825,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": {
-                        [key: string]: unknown;
-                    };
+                    "application/json": components["schemas"]["G2"];
                 };
             };
             /** @description Validation Error */
@@ -901,9 +1854,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": {
-                        [key: string]: unknown;
-                    };
+                    "application/json": components["schemas"]["Info"];
                 };
             };
         };
@@ -927,9 +1878,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": {
-                        [key: string]: unknown;
-                    };
+                    "application/json": components["schemas"]["Intt"];
                 };
             };
             /** @description Validation Error */
@@ -962,9 +1911,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": {
-                        [key: string]: unknown;
-                    };
+                    "application/json": components["schemas"]["Saxs1d"];
                 };
             };
             /** @description Validation Error */
@@ -997,9 +1944,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": {
-                        [key: string]: unknown;
-                    };
+                    "application/json": components["schemas"]["Tauq"];
                 };
             };
             /** @description Validation Error */
