@@ -1,6 +1,7 @@
 // Copyright © UChicago Argonne LLC
 // See LICENSE file for details
 
+import { createQueryClient } from "@beamline-web/client";
 import { render, screen, waitFor } from "@testing-library/react";
 import { afterEach, expect, test, vi } from "vitest";
 
@@ -69,7 +70,7 @@ test("lists the folder, shows a file's metadata and writes the URL", async () =>
       },
     }),
   );
-  render(<App />);
+  render(<App client={createQueryClient()} />);
   expect(await screen.findByText("/data/run42")).toBeTruthy();
   expect(await screen.findByText("a")).toBeTruthy();
   screen.getByText("a").click();
@@ -80,6 +81,6 @@ test("lists the folder, shows a file's metadata and writes the URL", async () =>
 
 test("reports a missing service", async () => {
   vi.stubGlobal("fetch", fakeFetch({}));
-  render(<App />);
+  render(<App client={createQueryClient()} />);
   expect(await screen.findByText(/Could not reach the service/)).toBeTruthy();
 });

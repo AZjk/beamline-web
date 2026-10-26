@@ -3,7 +3,7 @@
 
 import { ApiError, createQueryClient } from "@beamline-web/client";
 import { AppShell, Placeholder, Tabs, useShortcuts, useStale } from "@beamline-web/ui";
-import { QueryClientProvider } from "@tanstack/react-query";
+import { QueryClientProvider, type QueryClient } from "@tanstack/react-query";
 import { useEffect, useMemo, useState } from "react";
 
 import { useInfo } from "./api/queries";
@@ -134,9 +134,10 @@ function Page() {
   );
 }
 
-export function App() {
+/** The app; a test passes its own query client so nothing is cached across tests. */
+export function App({ client = queryClient }: { client?: QueryClient }) {
   return (
-    <QueryClientProvider client={queryClient}>
+    <QueryClientProvider client={client}>
       <Page />
     </QueryClientProvider>
   );
