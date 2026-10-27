@@ -147,7 +147,7 @@ jobs:
 
       - name: Without a GIXSU_TOKEN secret the service cannot be installed; the rest is skipped
         if: env.GIXSU_TOKEN == ''
-        run: echo "no GIXSU_TOKEN: skipping the gixs end-to-end flow"
+        run: echo "no GIXSU_TOKEN secret, so the gixs end-to-end flow is skipped"
 
       - uses: pnpm/action-setup@v4
         if: env.GIXSU_TOKEN != ''
