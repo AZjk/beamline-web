@@ -2,7 +2,14 @@
 // See LICENSE file for details
 
 import { ApiError, createQueryClient } from "@beamline-web/client";
-import { AppShell, Placeholder, Tabs, useShortcuts, useStale } from "@beamline-web/ui";
+import {
+  AppShell,
+  ErrorBoundary,
+  Placeholder,
+  Tabs,
+  useShortcuts,
+  useStale,
+} from "@beamline-web/ui";
 import { QueryClientProvider, type QueryClient } from "@tanstack/react-query";
 import { useEffect, useMemo, useState } from "react";
 
@@ -42,7 +49,9 @@ function TabContent({ id, visible }: { id: string; visible: boolean }) {
   const Component = plugin.component;
   return (
     <div className="h-full min-h-0">
-      <Component visible={visible} />
+      <ErrorBoundary label={`The ${typeof plugin.label === "string" ? plugin.label : id} tab`}>
+        <Component visible={visible} />
+      </ErrorBoundary>
     </div>
   );
 }
@@ -142,7 +151,9 @@ function Page() {
       left={<FilesPane onListed={() => setListed(true)} />}
       center={
         <div className="h-full p-1.5">
-          <ImagePane />
+          <ErrorBoundary label="The image" className="rounded-md border border-line bg-surface">
+            <ImagePane />
+          </ErrorBoundary>
         </div>
       }
       right={<AnalysisTabs />}

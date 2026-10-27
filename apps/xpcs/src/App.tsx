@@ -4,6 +4,7 @@
 import { ApiError, createQueryClient } from "@beamline-web/client";
 import {
   AppShell,
+  ErrorBoundary,
   Pane,
   PaneGroup,
   PaneHandle,
@@ -58,7 +59,9 @@ function TabContent({ id, visible }: { id: string; visible: boolean }) {
   const Component = plugin.component;
   return (
     <div className="h-full min-h-0">
-      <Component visible={visible} />
+      <ErrorBoundary label={`The ${typeof plugin.label === "string" ? plugin.label : id} tab`}>
+        <Component visible={visible} />
+      </ErrorBoundary>
     </div>
   );
 }
@@ -144,7 +147,9 @@ function Page() {
           className="h-full p-1.5"
         >
           <Pane id="image" defaultSize={46} minSize={20}>
-            <ImagePane />
+            <ErrorBoundary label="The image" className="rounded-md border border-line bg-surface">
+              <ImagePane />
+            </ErrorBoundary>
           </Pane>
           {panels.map((plugin, i) => {
             const Component = plugin.component;
@@ -155,7 +160,11 @@ function Page() {
                 className="my-1.5 bg-transparent"
               />,
               <Pane key={plugin.id} id={plugin.id} defaultSize={i === 0 ? 32 : 22} minSize={12}>
-                <Component visible />
+                <ErrorBoundary
+                  label={`The ${typeof plugin.label === "string" ? plugin.label : plugin.id} panel`}
+                >
+                  <Component visible />
+                </ErrorBoundary>
               </Pane>,
             ];
           })}

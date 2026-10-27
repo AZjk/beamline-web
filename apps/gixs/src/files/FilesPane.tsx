@@ -6,6 +6,7 @@
 
 import {
   Card,
+  ErrorBoundary,
   FileBrowser,
   MetadataCard,
   Pane,
@@ -56,7 +57,9 @@ function SideTabs() {
         const Component = registry.get(id)!.component;
         return (
           <div className="h-full min-h-0">
-            <Component visible={id === value} />
+            <ErrorBoundary label={`The ${id} tab`}>
+              <Component visible={id === value} />
+            </ErrorBoundary>
           </div>
         );
       }}

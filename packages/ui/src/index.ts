@@ -20,6 +20,8 @@ export { Pane, PaneGroup, PaneHandle } from "./components/Panes";
 export { Toaster, toast, useToasts } from "./components/Toaster";
 export type { ToastItem, ToastKind } from "./components/Toaster";
 export { Busy, Placeholder, useDelayed } from "./components/Busy";
+export { ErrorBoundary, webglHint } from "./components/ErrorBoundary";
+export type { ErrorBoundaryProps } from "./components/ErrorBoundary";
 export { AppShell, Card } from "./shell/AppShell";
 export type { AppShellProps } from "./shell/AppShell";
 export { FileBrowser } from "./files/FileBrowser";
