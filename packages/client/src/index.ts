@@ -17,3 +17,5 @@ export { SESSION_HEADER, newSessionId, resetSessionId, sessionHeaders, sessionId
 export { FINISHED, JobError, cancelJob, jobEventsUrl, runJob, watchJob } from "./jobs";
 export type { JobState, JobStatus, RunJobOptions } from "./jobs";
 export { createQueryClient } from "./query";
+export { unpackFlat, unpackNumbers, unpackRows } from "./packed";
+export type { PackedArray } from "./packed";

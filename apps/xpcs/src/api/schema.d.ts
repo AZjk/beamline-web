@@ -657,7 +657,7 @@ export interface components {
              * Fit Func
              * @default single
              */
-            fit_func: string;
+            fit_func?: string;
             /**
              * Names
              * @description files of the folder, in plot order
@@ -702,7 +702,7 @@ export interface components {
              * With Fit
              * @default true
              */
-            with_fit: boolean;
+            with_fit?: boolean;
         };
         /** G2Stability */
         G2Stability: {
@@ -779,7 +779,7 @@ export interface components {
              * Status
              * @default ok
              */
-            status: string;
+            status?: string;
             /** Version */
             version: string;
         };
@@ -965,7 +965,7 @@ export interface components {
              * Max Points
              * @default 16000
              */
-            max_points: number;
+            max_points?: number;
             /**
              * Names
              * @description files of the folder, in plot order
@@ -975,12 +975,12 @@ export interface components {
              * Sampling
              * @default 1
              */
-            sampling: number;
+            sampling?: number;
             /**
              * Window
              * @default 1
              */
-            window: number;
+            window?: number;
         };
         /**
          * JobState
@@ -994,7 +994,7 @@ export interface components {
              * @description steps done
              * @default 0
              */
-            done: number;
+            done?: number;
             /**
              * Error
              * @description why it failed
@@ -1036,7 +1036,7 @@ export interface components {
              * @description steps in all; 0 while unknown
              * @default 0
              */
-            total: number;
+            total?: number;
         };
         /**
          * PackedArray
@@ -1130,19 +1130,19 @@ export interface components {
              * Absolute
              * @default false
              */
-            absolute: boolean;
+            absolute?: boolean;
             /**
              * All Phi
              * @default false
              */
-            all_phi: boolean;
+            all_phi?: boolean;
             /** Background */
             background?: string | null;
             /**
              * Bkg Weight
              * @default 1
              */
-            bkg_weight: number;
+            bkg_weight?: number;
             /**
              * Names
              * @description files of the folder, in plot order
@@ -1152,14 +1152,14 @@ export interface components {
              * Norm
              * @default none
              */
-            norm: string;
+            norm?: string;
             /** Q Range */
             q_range?: number[] | null;
             /**
              * Sampling
              * @default 1
              */
-            sampling: number;
+            sampling?: number;
         };
         /** Skipped */
         Skipped: {
@@ -1244,7 +1244,7 @@ export interface components {
              * Fit
              * @default true
              */
-            fit: boolean;
+            fit?: boolean;
             /** Fit Flag */
             fit_flag?: boolean[] | null;
             /**

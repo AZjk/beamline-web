@@ -30,7 +30,7 @@ for (const app of readdirSync(appsDir)) {
   const spec = path.join(appsDir, app, "openapi.json");
   if (!existsSync(spec)) continue;
   const document = JSON.parse(await readFile(spec, "utf8"));
-  const ast = await openapiTS(document, { alphabetize: true });
+  const ast = await openapiTS(document, { alphabetize: true, defaultNonNullable: false });
   const out = path.join(appsDir, app, "src", "api", "schema.d.ts");
   await mkdir(path.dirname(out), { recursive: true });
   await writeFile(out, header + astToString(ast));

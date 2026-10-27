@@ -17,6 +17,7 @@ import {
   api,
   type C2Meta,
   type Files,
+  type G2Fit,
   type G2Meta,
   type HdfInfo,
   type ImageKind,
@@ -156,4 +157,23 @@ export function useC2Array(name: string | null, params: C2Params, enabled = true
       }) as Promise<WireArray<Float32Array, C2Meta>>,
     enabled: name !== null && enabled,
   });
+}
+
+/** The binary g2 route, for `useQueries`. */
+export function fetchG2Array(
+  name: string,
+  params: RangeParams,
+): Promise<WireArray<Float32Array, G2Meta>> {
+  return fetchArray<G2Meta>(apiUrl(`${filePath(name)}/g2/data`, { ...params }), {
+    headers: sessionHeaders(),
+  }) as Promise<WireArray<Float32Array, G2Meta>>;
+}
+
+/** The page's fit of a file, matched to the g2 route's q values; null without a fit. */
+export async function fetchG2Fit(name: string, params: RangeParams): Promise<G2Fit | null> {
+  const answer = await api.GET("/api/files/{name}/g2/fit", {
+    params: { path: { name }, query: { ...params } },
+  });
+  if (answer.response.status === 200 && answer.data === undefined) return null;
+  return unwrap(answer) as G2Fit | null;
 }

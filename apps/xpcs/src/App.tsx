@@ -104,7 +104,8 @@ function Page() {
   useUrlState(listed);
   const active = useAppStore((s) => s.active);
   const files = useAppStore((s) => s.files);
-  const status = active ? labelOf({ files }, active) : "No file shown";
+  const message = useAppStore((s) => s.message);
+  const status = message ?? (active ? labelOf({ files }, active) : "No file shown");
   useEffect(() => {
     document.title = active ? `${labelOf({ files }, active)} — pyXPCSViewer` : "pyXPCSViewer";
   }, [active, files]);
@@ -126,6 +127,7 @@ function Page() {
       />
     );
   }
+  const panels = registry.list("panel");
   return (
     <AppShell
       brand={<Brand />}
@@ -138,18 +140,25 @@ function Page() {
         <PaneGroup
           orientation="vertical"
           storageKey="xpcs:center"
-          panelIds={["image", "panels"]}
+          panelIds={["image", ...panels.map((p) => p.id)]}
           className="h-full p-1.5"
         >
-          <Pane id="image" defaultSize={58} minSize={25}>
+          <Pane id="image" defaultSize={46} minSize={20}>
             <ImagePane />
           </Pane>
-          <PaneHandle orientation="vertical" className="my-1.5 bg-transparent" />
-          <Pane id="panels" defaultSize={42} minSize={15}>
-            <Placeholder>
-              The I(q) and I(t) panels arrive with the next step of Phase 1.
-            </Placeholder>
-          </Pane>
+          {panels.map((plugin, i) => {
+            const Component = plugin.component;
+            return [
+              <PaneHandle
+                key={`${plugin.id}-handle`}
+                orientation="vertical"
+                className="my-1.5 bg-transparent"
+              />,
+              <Pane key={plugin.id} id={plugin.id} defaultSize={i === 0 ? 32 : 22} minSize={12}>
+                <Component visible />
+              </Pane>,
+            ];
+          })}
         </PaneGroup>
       }
       right={<AnalysisTabs />}

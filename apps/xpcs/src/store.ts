@@ -16,6 +16,12 @@ export interface AppState extends SharedState {
   /** The C2 block shown on the two-time tab, shared with the image's bin overlay. */
   twotimeSelection: number;
   setTwotimeSelection: (index: number) => void;
+  /** Bumped when the page's g2 fits change, so the fit queries and τ(q) refetch. */
+  fitVersion: number;
+  bumpFitVersion: () => void;
+  /** A line for the message bar: a job's progress, a note. */
+  message: string | null;
+  setMessage: (message: string | null) => void;
 }
 
 export const useAppStore = create<AppState>()((...a) => ({
@@ -26,6 +32,10 @@ export const useAppStore = create<AppState>()((...a) => ({
   setFiles: (files, total) => a[0]({ files, total }),
   twotimeSelection: 0,
   setTwotimeSelection: (twotimeSelection) => a[0]({ twotimeSelection }),
+  fitVersion: 0,
+  bumpFitVersion: () => a[0]((s) => ({ fitVersion: s.fitVersion + 1 })),
+  message: null,
+  setMessage: (message) => a[0]({ message }),
 }));
 
 export const fileRow = (state: Pick<AppState, "files">, id: string | null) =>
