@@ -95,6 +95,34 @@ export function toNdArray(
   return ndarray(data, [rows, cols]);
 }
 
+/**
+ * The array with its rows and/or columns reversed. H5Web's axis flip reverses the scale the
+ * axes, the pointer and the SVG use, not the texture: the texture's first row always lands on
+ * the plane's bottom edge, which a flipped ordinate labels with the largest y. So the mesh gets
+ * the rows reversed when the y axis is flipped (and the columns when x is), and the picture
+ * agrees with the marks drawn over it.
+ */
+export function oriented<T extends Float32Array | Uint8Array | Uint16Array>(
+  data: T,
+  rows: number,
+  cols: number,
+  flipX: boolean,
+  flipY: boolean,
+): T {
+  if (!flipX && !flipY) return data;
+  const out = new (data.constructor as new (n: number) => T)(data.length);
+  for (let r = 0; r < rows; r += 1) {
+    const source = (flipY ? rows - 1 - r : r) * cols;
+    const target = r * cols;
+    if (!flipX) {
+      out.set(data.subarray(source, source + cols), target);
+    } else {
+      for (let c = 0; c < cols; c += 1) out[target + c] = data[source + cols - 1 - c]!;
+    }
+  }
+  return out;
+}
+
 export function ArrayImage({
   data,
   rows,
@@ -119,7 +147,10 @@ export function ArrayImage({
   onClick,
   className,
 }: ArrayImageProps) {
-  const values = useMemo(() => toNdArray(data, rows, cols), [data, rows, cols]);
+  const values = useMemo(
+    () => toNdArray(oriented(data, rows, cols, flipX, flipY), rows, cols),
+    [data, rows, cols, flipX, flipY],
+  );
   const abscissa: AxisConfig = useMemo(
     () => ({
       visDomain: [extent.xmin, extent.xmax],

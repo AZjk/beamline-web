@@ -12,7 +12,7 @@ export {
   seriesColor,
 } from "./colormaps";
 export type { ColorStop, ColormapName, H5WebColorMap } from "./colormaps";
-export { ArrayImage, toNdArray } from "./image/ArrayImage";
+export { ArrayImage, oriented, toNdArray } from "./image/ArrayImage";
 export type { ArrayImageProps, ImageExtent, ImageScale } from "./image/ArrayImage";
 export { DetectorImage } from "./image/DetectorImage";
 export { DataOverlays } from "./image/DataOverlays";
