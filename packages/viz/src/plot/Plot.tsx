@@ -1,8 +1,6 @@
 // Copyright © UChicago Argonne LLC
 // See LICENSE file for details
 
-/// <reference path="../types/plotly.d.ts" />
-
 /**
  * A Plotly figure in the kit's style. Plotly (the gl2d bundle: scatter in SVG, WebGL scatter
  * for large series) loads on first use, so a page that shows no plot never pays for it. The

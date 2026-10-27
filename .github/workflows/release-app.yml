@@ -1,0 +1,49 @@
+name: Release an app's bundle
+
+# A tag names the app and the tool version it is built for, e.g. xpcs-v1.3.0: the built bundle
+# becomes a release asset that the tool's own release workflow downloads into its wheel.
+on:
+  push:
+    tags:
+      - "xpcs-v*"
+      - "gixs-v*"
+      - "mask-v*"
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: build and attach the bundle
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Which app
+        id: which
+        run: |
+          app="${GITHUB_REF_NAME%%-v*}"
+          echo "app=$app" >> "$GITHUB_OUTPUT"
+          echo "version=${GITHUB_REF_NAME#*-v}" >> "$GITHUB_OUTPUT"
+
+      - run: pnpm --filter "@beamline-web/app-${{ steps.which.outputs.app }}" build
+
+      - name: Pack the bundle
+        run: tar -czf "${{ steps.which.outputs.app }}-dist.tar.gz" -C "apps/${{ steps.which.outputs.app }}/dist" .
+
+      - name: Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" "${{ steps.which.outputs.app }}-dist.tar.gz" \
+            --title "${{ steps.which.outputs.app }} app for tool version ${{ steps.which.outputs.version }}" \
+            --notes "The built ${{ steps.which.outputs.app }} app, to be served by the tool's wheel of version ${{ steps.which.outputs.version }}."

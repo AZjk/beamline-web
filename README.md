@@ -81,6 +81,24 @@ uv run ruff check . && uv run ruff format --check . && uv run mypy
 4. The document's `info.version` is the API schema version, not the package version, so it only
    changes when the API does. The frontend refuses a different major version (Phase 1).
 
+## Releasing an app into its tool
+
+A tool's release carries the built app in its wheel, so `pip install xpcs-viewer[web]` serves the
+new page with no Node on the machine:
+
+1. Tag this repository `xpcs-v<version>` with the tool version about to be released. The
+   `Release an app's bundle` workflow builds `apps/xpcs` and attaches `xpcs-dist.tar.gz` to a
+   GitHub release of that tag.
+2. Tag the tool `v<version>`. Its publish workflow downloads that asset into
+   `src/<tool>/web/static/` before building the wheel.
+
+For a local install, build and copy by hand:
+
+```sh
+pnpm --filter @beamline-web/app-xpcs build
+node scripts/deploy-app.mjs xpcs ../pyXpcsViewer/src/pyxpcsviewer/web/static
+```
+
 ## Releasing the shared Python package
 
 Tag the monorepo as `webkit-py-vX.Y.Z` after bumping `packages/webkit-py/pyproject.toml`. Until it
