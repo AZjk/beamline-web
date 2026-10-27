@@ -1,15 +1,18 @@
 // Copyright © UChicago Argonne LLC
 // See LICENSE file for details
 
-/** The sum of each column of the image below it and of each row at its left, from the array
- * the page holds (no request), over the whole image. */
+/**
+ * The sum of each column of the image below it and of each row at its left, from the array the
+ * page holds (no request). They carry the image's axes: their ranges follow the image's pan and
+ * zoom, their plot areas are aligned with the canvas, and the image shows no axes of its own.
+ */
 
 import {
   INK,
+  Plot,
   axis,
   baseLayout,
   logAxis,
-  Plot,
   type PlotData,
   type PlotLayout,
 } from "@beamline-web/viz";
@@ -43,8 +46,13 @@ export function imageSums(data: Float32Array, rows: number, cols: number, binnin
   };
 }
 
-const tiny = (extra: Partial<PlotLayout> = {}): Partial<PlotLayout> =>
-  baseLayout({ margin: { l: 44, r: 8, t: 4, b: 22 }, showlegend: false, ...extra });
+/** Where the image's canvas sits inside its cell: the plots' areas line up with it. */
+export interface Offsets {
+  left: number;
+  right: number;
+  top: number;
+  bottom: number;
+}
 
 interface SumsProps {
   data: Float32Array;
@@ -54,6 +62,12 @@ interface SumsProps {
   log: boolean;
   flipX: boolean;
   flipY: boolean;
+  xLabel: string;
+  yLabel: string;
+  /** The image's visible ranges (ascending); the whole axis without them. */
+  xRange: [number, number] | null;
+  yRange: [number, number] | null;
+  offsets: Offsets;
 }
 
 const line = (x: number[], y: number[], hover: string): Partial<PlotData> => ({
@@ -67,38 +81,60 @@ const line = (x: number[], y: number[], hover: string): Partial<PlotData> => ({
 });
 
 const intensity = (log: boolean) =>
-  log ? logAxis({ showticklabels: false }) : axis({ showticklabels: false });
+  log
+    ? logAxis({ showticklabels: false, ticks: "", automargin: false })
+    : axis({ showticklabels: false, ticks: "", automargin: false });
 
-/** The sum of each column, below the image. */
-export function ColumnSums({ data, x, y, binning, log, flipX }: SumsProps) {
+const ranged = (range: [number, number] | null, flipped: boolean) =>
+  range
+    ? { range: flipped ? [range[1], range[0]] : range, autorange: false as const }
+    : { autorange: flipped ? ("reversed" as const) : true };
+
+/** The sum of each column, below the image, with the image's x axis. */
+export function ColumnSums({
+  data,
+  x,
+  y,
+  binning,
+  log,
+  flipX,
+  xLabel,
+  xRange,
+  offsets,
+}: SumsProps) {
   const sums = useMemo(() => imageSums(data, y.n, x.n, binning), [data, x.n, y.n, binning]);
   const ys = sums.columns.map((v) => (log && !(v > 0) ? Number.NaN : v));
+  const layout: Partial<PlotLayout> = baseLayout({
+    showlegend: false,
+    margin: { l: offsets.left, r: offsets.right, t: 2, b: 40 },
+    xaxis: { ...axis({ title: xLabel, automargin: false }), ...ranged(xRange, flipX) },
+    yaxis: intensity(log),
+  });
   return (
-    <div className="min-h-0 border-t border-line" aria-label="column sums">
+    <div className="h-full min-h-0" aria-label="column sums">
       <Plot
         data={[line(values(x), ys, "%{x:.5g}<br>Σ I %{y:.4g}<extra>column sum</extra>")]}
-        layout={tiny({
-          xaxis: axis({ autorange: flipX ? "reversed" : true }),
-          yaxis: intensity(log),
-        })}
+        layout={layout}
       />
     </div>
   );
 }
 
-/** The sum of each row, at the image's left. */
-export function RowSums({ data, x, y, binning, log, flipY }: SumsProps) {
+/** The sum of each row, at the image's left, with the image's y axis. */
+export function RowSums({ data, x, y, binning, log, flipY, yLabel, yRange, offsets }: SumsProps) {
   const sums = useMemo(() => imageSums(data, y.n, x.n, binning), [data, x.n, y.n, binning]);
   const xs = sums.rows.map((v) => (log && !(v > 0) ? Number.NaN : v));
+  const layout: Partial<PlotLayout> = baseLayout({
+    showlegend: false,
+    margin: { l: 56, r: 2, t: offsets.top, b: offsets.bottom },
+    xaxis: intensity(log),
+    yaxis: { ...axis({ title: yLabel, automargin: false }), ...ranged(yRange, flipY) },
+  });
   return (
-    <div className="min-w-0 border-r border-line" aria-label="row sums">
+    <div className="h-full min-w-0" aria-label="row sums">
       <Plot
         data={[line(xs, values(y), "%{y:.5g}<br>Σ I %{x:.4g}<extra>row sum</extra>")]}
-        layout={tiny({
-          margin: { l: 8, r: 4, t: 4, b: 22 },
-          xaxis: intensity(log),
-          yaxis: axis({ autorange: flipY ? "reversed" : true, showticklabels: false }),
-        })}
+        layout={layout}
       />
     </div>
   );

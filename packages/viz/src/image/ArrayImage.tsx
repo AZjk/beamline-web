@@ -66,6 +66,8 @@ export interface ArrayImageProps {
   /** Draw x decreasing to the right, y decreasing upwards (a detector with row 0 at the top). */
   flipX?: boolean;
   flipY?: boolean;
+  /** The axes with their ticks and labels around the canvas (off when a panel beside it carries them). */
+  showAxes?: boolean;
   /** H5Web's default interactions, each configurable or off (`pan: false` while a tool draws). */
   interactions?: ComponentProps<typeof DefaultInteractions>;
   onHover?: (x: number, y: number) => void;
@@ -141,6 +143,7 @@ export function ArrayImage({
   svg,
   flipX = false,
   flipY = false,
+  showAxes = true,
   interactions,
   onHover,
   onLeave,
@@ -178,7 +181,12 @@ export function ArrayImage({
           z-index is what keeps its layers, drawn at negative z-indices, inside its own stacking context;
           as a block child they would paint under any opaque background higher up */}
       <div className="relative flex min-h-0 min-w-0 flex-1">
-        <VisCanvas abscissaConfig={abscissa} ordinateConfig={ordinate} aspect={aspect}>
+        <VisCanvas
+          abscissaConfig={abscissa}
+          ordinateConfig={ordinate}
+          aspect={aspect}
+          showAxes={showAxes}
+        >
           <DefaultInteractions {...interactions} />
           <ResetZoomButton />
           <HeatmapMesh

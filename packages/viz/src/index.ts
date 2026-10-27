@@ -18,6 +18,8 @@ export { DetectorImage } from "./image/DetectorImage";
 export { DataOverlays } from "./image/DataOverlays";
 export type { OverlayItem } from "./image/DataOverlays";
 export { OverlayMesh } from "./image/OverlayMesh";
+export { ViewportReporter } from "./image/Viewport";
+export type { Viewport } from "./image/Viewport";
 export type { OverlayMeshProps } from "./image/OverlayMesh";
 export type { DetectorImageProps, LabelOverlay } from "./image/DetectorImage";
 export { levelsAt, percentile, positivePart, sortedFinite } from "./image/levels";

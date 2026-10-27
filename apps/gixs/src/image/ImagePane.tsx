@@ -27,6 +27,7 @@ import {
   COLORMAPS,
   DataOverlays,
   ShapeEditor,
+  ViewportReporter,
   editorInteractions,
   h5webColorMap,
   levelsAt,
@@ -34,6 +35,7 @@ import {
   type OverlayItem,
   type RectShape,
   type Shape,
+  type Viewport,
 } from "@beamline-web/viz";
 import { DomainWidget, ScaleType, type CustomDomain, type Domain } from "@h5web/lib";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -43,7 +45,7 @@ import { contextOf, queryOf } from "../api/context";
 import { useImageArray, useInfo, useOverlayTraces, useSummary } from "../api/queries";
 import { flatOverlays, useAppStore } from "../store";
 import { roiWithShape, sameRect, shapesOf, type Extent } from "./roiShapes";
-import { ColumnSums, RowSums } from "./SumsPanels";
+import { ColumnSums, RowSums, type Offsets } from "./SumsPanels";
 
 interface ImageSettings {
   view: string;
@@ -278,6 +280,42 @@ export function ImagePane() {
   // the editor's shape list is derived: a shape it added is replaced by the ROI the server made
   const editorShapes = useMemo(() => shaped.shapes as Shape[], [shaped.shapes]);
 
+  // the sums beside the image: the image's visible ranges, and where its canvas sits in the cell
+  const [viewport, setViewport] = useState<Viewport | null>(null);
+  const cell = useRef<HTMLDivElement>(null);
+  const [offsets, setOffsets] = useState<Offsets>({ left: 0, right: 0, top: 0, bottom: 0 });
+  useEffect(() => {
+    const el = cell.current;
+    if (!el || !settings.sums) return;
+    const measure = () => {
+      const canvas = el.querySelector("canvas");
+      if (!canvas) return;
+      const outer = el.getBoundingClientRect();
+      const inner = canvas.getBoundingClientRect();
+      const next = {
+        left: Math.max(0, Math.round(inner.left - outer.left)),
+        right: Math.max(0, Math.round(outer.right - inner.right)),
+        top: Math.max(0, Math.round(inner.top - outer.top)),
+        bottom: Math.max(0, Math.round(outer.bottom - inner.bottom)),
+      };
+      setOffsets((o) =>
+        o.left === next.left &&
+        o.right === next.right &&
+        o.top === next.top &&
+        o.bottom === next.bottom
+          ? o
+          : next,
+      );
+    };
+    const observer = new ResizeObserver(measure);
+    observer.observe(el);
+    const timer = window.setTimeout(measure, 50);
+    return () => {
+      observer.disconnect();
+      window.clearTimeout(timer);
+    };
+  }, [settings.sums, active, data]);
+
   // the readout: q and the angles from the server, the value from the array at once
   const [hover, setHover] = useState<{ x: number; y: number } | null>(null);
   const [pixel, setPixel] = useState<PixelInfo | null>(null);
@@ -450,8 +488,8 @@ export function ImagePane() {
             <div
               className="grid min-h-0 min-w-0 flex-1"
               style={{
-                gridTemplateColumns: settings.sums ? "7rem minmax(0, 1fr)" : "minmax(0, 1fr)",
-                gridTemplateRows: settings.sums ? "minmax(0, 1fr) 6rem" : "minmax(0, 1fr)",
+                gridTemplateColumns: settings.sums ? "8rem minmax(0, 1fr)" : "minmax(0, 1fr)",
+                gridTemplateRows: settings.sums ? "minmax(0, 1fr) 7rem" : "minmax(0, 1fr)",
               }}
             >
               {settings.sums ? (
@@ -463,38 +501,47 @@ export function ImagePane() {
                   log={logScale}
                   flipX={meta.x_reversed}
                   flipY={meta.y_reversed}
+                  xLabel={meta.x_label}
+                  yLabel={meta.y_label}
+                  xRange={viewport?.x ?? null}
+                  yRange={viewport?.y ?? null}
+                  offsets={offsets}
                 />
               ) : null}
-              <ArrayImage
-                data={data}
-                rows={meta.y.n}
-                cols={meta.x.n}
-                extent={extent}
-                xLabel={meta.x_label}
-                yLabel={meta.y_label}
-                domain={domain}
-                scale={logScale ? "log" : "linear"}
-                colorMap={colorMap}
-                invertColorMap={invert}
-                aspect={view.equal_aspect ? "equal" : "auto"}
-                colorBarLabel={logScale ? "I (log)" : "I"}
-                flipX={meta.x_reversed}
-                flipY={meta.y_reversed}
-                interactions={editorInteractions(tool === "box" ? "rect" : "select", selectedBox)}
-                onHover={onHover}
-                onLeave={onLeave}
-              >
-                <DataOverlays items={overlayItems} />
-                <ShapeEditor
-                  tool={tool === "box" ? "rect" : "select"}
-                  shapes={editorShapes}
-                  onChange={onShapes}
-                  selectedId={selectedBox}
-                  onSelect={setSelectedBox}
-                  onDrawn={(shape) => void onDrawn(shape)}
-                  styles={shaped.styles}
-                />
-              </ArrayImage>
+              <div ref={cell} className="flex min-h-0 min-w-0">
+                <ArrayImage
+                  data={data}
+                  rows={meta.y.n}
+                  cols={meta.x.n}
+                  extent={extent}
+                  xLabel={meta.x_label}
+                  yLabel={meta.y_label}
+                  domain={domain}
+                  scale={logScale ? "log" : "linear"}
+                  colorMap={colorMap}
+                  invertColorMap={invert}
+                  aspect={view.equal_aspect ? "equal" : "auto"}
+                  colorBarLabel={logScale ? "I (log)" : "I"}
+                  flipX={meta.x_reversed}
+                  flipY={meta.y_reversed}
+                  showAxes={!settings.sums}
+                  interactions={editorInteractions(tool === "box" ? "rect" : "select", selectedBox)}
+                  onHover={onHover}
+                  onLeave={onLeave}
+                >
+                  {settings.sums ? <ViewportReporter onChange={setViewport} /> : null}
+                  <DataOverlays items={overlayItems} />
+                  <ShapeEditor
+                    tool={tool === "box" ? "rect" : "select"}
+                    shapes={editorShapes}
+                    onChange={onShapes}
+                    selectedId={selectedBox}
+                    onSelect={setSelectedBox}
+                    onDrawn={(shape) => void onDrawn(shape)}
+                    styles={shaped.styles}
+                  />
+                </ArrayImage>
+              </div>
               {settings.sums ? (
                 <div style={{ gridColumn: 2 }} className="min-h-0">
                   <ColumnSums
@@ -505,6 +552,11 @@ export function ImagePane() {
                     log={logScale}
                     flipX={meta.x_reversed}
                     flipY={meta.y_reversed}
+                    xLabel={meta.x_label}
+                    yLabel={meta.y_label}
+                    xRange={viewport?.x ?? null}
+                    yRange={viewport?.y ?? null}
+                    offsets={offsets}
                   />
                 </div>
               ) : null}
