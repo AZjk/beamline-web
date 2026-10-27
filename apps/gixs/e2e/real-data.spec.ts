@@ -15,7 +15,7 @@ test("load, select, image, views, cut, peaks, setup, calibrate, series", async (
   await expect(rows.first()).toBeVisible({ timeout: 15_000 });
   await rows.filter({ hasText: "film_a" }).first().click();
   await expect(page.getByRole("status")).toHaveText(/film_a/);
-  await expect(page.getByText("Detector", { exact: true })).toBeVisible();
+  await expect(page.getByRole("rowheader", { name: "Detector" })).toBeVisible();
   await expect(page.getByLabel("processing status")).toContainText("level I2");
 
   // the image renders on a canvas, in each view; the color map and scale ask the server nothing
@@ -34,6 +34,13 @@ test("load, select, image, views, cut, peaks, setup, calibrate, series", async (
   await page.getByLabel("color map").selectOption("inferno");
   await page.waitForTimeout(500);
   expect(imageRequests).toEqual([]);
+  // the sums beside the image come from the array the page holds
+  await page.getByLabel("sums", { exact: true }).check();
+  await expect(page.getByLabel("column sums")).toBeVisible();
+  await expect(page.getByLabel("row sums")).toBeVisible();
+  await page.waitForTimeout(300);
+  expect(imageRequests).toEqual([]);
+  await page.getByLabel("sums", { exact: true }).uncheck();
   await page.getByRole("radiogroup", { name: "view" }).getByRole("radio", { name: /q_r/ }).click();
   await expect(image.locator("canvas")).toBeVisible({ timeout: 30_000 });
   await page.waitForTimeout(800);

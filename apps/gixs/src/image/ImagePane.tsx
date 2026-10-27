@@ -43,6 +43,7 @@ import { contextOf, queryOf } from "../api/context";
 import { useImageArray, useInfo, useOverlayTraces, useSummary } from "../api/queries";
 import { flatOverlays, useAppStore } from "../store";
 import { roiWithShape, sameRect, shapesOf, type Extent } from "./roiShapes";
+import { ColumnSums, RowSums } from "./SumsPanels";
 
 interface ImageSettings {
   view: string;
@@ -52,6 +53,7 @@ interface ImageSettings {
   high: number;
   autoLevels: boolean;
   alignment: boolean;
+  sums: boolean;
 }
 
 const DEFAULTS: ImageSettings = {
@@ -62,6 +64,7 @@ const DEFAULTS: ImageSettings = {
   high: 99.8,
   autoLevels: true,
   alignment: true,
+  sums: false,
 };
 const HINT =
   "Hover over the image for q and the angles. Scroll to zoom, drag to pan, double-click to reset; with the box tool, drag to add a cut.";
@@ -407,6 +410,13 @@ export function ImagePane() {
           auto levels
         </Toggle>
         <Toggle
+          checked={settings.sums}
+          onChange={(v) => set("sums", v)}
+          title="The sum of each column below the image and of each row at its left"
+        >
+          sums
+        </Toggle>
+        <Toggle
           checked={settings.alignment}
           onChange={(v) => set("alignment", v)}
           title="The direct beam, the specular reflection (αf = αi), the sample horizon (αf = 0) and the sample normal (2θf = 0)"
@@ -437,36 +447,68 @@ export function ImagePane() {
           <Placeholder error>{error}</Placeholder>
         ) : data && meta && extent && view ? (
           <div className="flex h-full min-h-0">
-            <ArrayImage
-              data={data}
-              rows={meta.y.n}
-              cols={meta.x.n}
-              extent={extent}
-              xLabel={meta.x_label}
-              yLabel={meta.y_label}
-              domain={domain}
-              scale={logScale ? "log" : "linear"}
-              colorMap={colorMap}
-              invertColorMap={invert}
-              aspect={view.equal_aspect ? "equal" : "auto"}
-              colorBarLabel={logScale ? "I (log)" : "I"}
-              flipX={meta.x_reversed}
-              flipY={meta.y_reversed}
-              interactions={editorInteractions(tool === "box" ? "rect" : "select", selectedBox)}
-              onHover={onHover}
-              onLeave={onLeave}
+            <div
+              className="grid min-h-0 min-w-0 flex-1"
+              style={{
+                gridTemplateColumns: settings.sums ? "7rem minmax(0, 1fr)" : "minmax(0, 1fr)",
+                gridTemplateRows: settings.sums ? "minmax(0, 1fr) 6rem" : "minmax(0, 1fr)",
+              }}
             >
-              <DataOverlays items={overlayItems} />
-              <ShapeEditor
-                tool={tool === "box" ? "rect" : "select"}
-                shapes={editorShapes}
-                onChange={onShapes}
-                selectedId={selectedBox}
-                onSelect={setSelectedBox}
-                onDrawn={(shape) => void onDrawn(shape)}
-                styles={shaped.styles}
-              />
-            </ArrayImage>
+              {settings.sums ? (
+                <RowSums
+                  data={data}
+                  x={meta.x}
+                  y={meta.y}
+                  binning={meta.binning}
+                  log={logScale}
+                  flipX={meta.x_reversed}
+                  flipY={meta.y_reversed}
+                />
+              ) : null}
+              <ArrayImage
+                data={data}
+                rows={meta.y.n}
+                cols={meta.x.n}
+                extent={extent}
+                xLabel={meta.x_label}
+                yLabel={meta.y_label}
+                domain={domain}
+                scale={logScale ? "log" : "linear"}
+                colorMap={colorMap}
+                invertColorMap={invert}
+                aspect={view.equal_aspect ? "equal" : "auto"}
+                colorBarLabel={logScale ? "I (log)" : "I"}
+                flipX={meta.x_reversed}
+                flipY={meta.y_reversed}
+                interactions={editorInteractions(tool === "box" ? "rect" : "select", selectedBox)}
+                onHover={onHover}
+                onLeave={onLeave}
+              >
+                <DataOverlays items={overlayItems} />
+                <ShapeEditor
+                  tool={tool === "box" ? "rect" : "select"}
+                  shapes={editorShapes}
+                  onChange={onShapes}
+                  selectedId={selectedBox}
+                  onSelect={setSelectedBox}
+                  onDrawn={(shape) => void onDrawn(shape)}
+                  styles={shaped.styles}
+                />
+              </ArrayImage>
+              {settings.sums ? (
+                <div style={{ gridColumn: 2 }} className="min-h-0">
+                  <ColumnSums
+                    data={data}
+                    x={meta.x}
+                    y={meta.y}
+                    binning={meta.binning}
+                    log={logScale}
+                    flipX={meta.x_reversed}
+                    flipY={meta.y_reversed}
+                  />
+                </div>
+              ) : null}
+            </div>
             {!settings.autoLevels ? (
               <div className="w-56 shrink-0 overflow-auto border-l border-line p-2 text-xs">
                 <DomainWidget
