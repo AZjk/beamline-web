@@ -3,8 +3,6 @@
 
 import "@h5web/lib/styles.css";
 
-export { Readout } from "./Readout";
-export type { ReadoutProps } from "./Readout";
 export {
   COLORMAPS,
   SERIES,

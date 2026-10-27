@@ -24,6 +24,19 @@ test("load, select, image, panels, fit, tau(q), metadata", async ({ page }) => {
   await page.mouse.move(box!.x + box!.width / 2, box!.y + box!.height / 2);
   await expect(page.getByLabel("readout")).toContainText("q ", { timeout: 10_000 });
 
+  // the scale, the color map and the levels are the GPU's: changing them asks the server nothing
+  const imageRequests: string[] = [];
+  page.on("request", (request) => {
+    if (/\/api\/files\/.*\/image/.test(request.url())) imageRequests.push(request.url());
+  });
+  const scale = page.getByRole("radiogroup", { name: "intensity scale" });
+  await scale.getByRole("radio", { name: "linear" }).click();
+  await scale.getByRole("radio", { name: "log" }).click();
+  await page.getByLabel("color map").selectOption("gray");
+  await page.getByLabel("color map").selectOption("viridis");
+  await page.waitForTimeout(500);
+  expect(imageRequests).toEqual([]);
+
   // the panels under the image draw
   await expect(page.getByLabel("I(q) figure").locator(".plot-container")).toBeVisible({
     timeout: 20_000,

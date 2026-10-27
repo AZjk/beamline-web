@@ -70,6 +70,8 @@ uv run pytest
 uv run ruff check . && uv run ruff format --check . && uv run mypy
 ```
 
+The [developer guide](docs/developer-guide.md) covers adding a plugin, an endpoint and a tool.
+
 ## Keeping the frontend and the API in step
 
 1. A change to a tool's routes regenerates the tool's committed document in the same pull

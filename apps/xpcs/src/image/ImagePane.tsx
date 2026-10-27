@@ -112,11 +112,8 @@ export function ImagePane() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tab]);
 
-  const image = useImageArray(active, {
-    kind: settings.kind,
-    scale: settings.kind === "saxs" ? settings.scale : "linear",
-    max_size: maxSize,
-  });
+  // the intensity comes linear: the log scale is the GPU's, so the switch never asks the server
+  const image = useImageArray(active, { kind: settings.kind, scale: "linear", max_size: maxSize });
   const overlay = useImageArray(
     active,
     { kind: "dqmap", scale: "linear", max_size: maxSize },
@@ -139,11 +136,18 @@ export function ImagePane() {
     () => (meta && meta.zmax > meta.zmin ? [meta.zmin, meta.zmax] : undefined),
     [meta],
   );
+  const logScale = settings.kind === "saxs" && settings.scale === "log";
   const domain = useMemo<Domain | undefined>(() => {
     const base = serverDomain ?? dataDomain;
-    if (settings.autoLevels) return base;
-    return [custom[0] ?? base[0], custom[1] ?? base[1]];
-  }, [serverDomain, dataDomain, settings.autoLevels, custom]);
+    const chosen: Domain = settings.autoLevels
+      ? base
+      : [custom[0] ?? base[0], custom[1] ?? base[1]];
+    if (!logScale) return chosen;
+    // a log scale needs a positive range: below zero the floor is a thousandth of the top
+    const top = chosen[1] > 0 ? chosen[1] : dataDomain[1] > 0 ? dataDomain[1] : 1;
+    const bottom = chosen[0] > 0 ? chosen[0] : top * 1e-3;
+    return [Math.min(bottom, top * 0.999), top];
+  }, [serverDomain, dataDomain, settings.autoLevels, custom, logScale]);
 
   // the readout: the sent value from the array at once, q and φ from the server, a little later
   const [hover, setHover] = useState<{ x: number; y: number } | null>(null);
@@ -304,7 +308,7 @@ export function ImagePane() {
               }}
               fullShape={meta.shape_full}
               colormap={settings.kind === "mask" ? "gray" : settings.cmap}
-              scale="linear"
+              scale={logScale ? "log" : "linear"}
               domain={domain}
               beamCenter={settings.center ? beamCenter : null}
               overlay={
@@ -324,8 +328,8 @@ export function ImagePane() {
               }
               colorBarLabel={
                 meta.kind === "saxs"
-                  ? meta.scale === "log"
-                    ? "log₁₀ I"
+                  ? logScale
+                    ? "I (log)"
                     : "I"
                   : meta.kind === "mask"
                     ? "mask"
@@ -340,7 +344,7 @@ export function ImagePane() {
                 <DomainWidget
                   dataDomain={dataDomain}
                   customDomain={custom}
-                  scaleType={ScaleType.Linear}
+                  scaleType={logScale ? ScaleType.Log : ScaleType.Linear}
                   onCustomDomainChange={setCustom}
                 />
               </div>
