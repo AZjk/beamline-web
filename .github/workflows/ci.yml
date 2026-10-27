@@ -138,45 +138,62 @@ jobs:
   e2e-gixs:
     name: gixs app over a real service (synthetic data)
     runs-on: ubuntu-latest
+    # gixsu's repository is private while its refactoring lands: the job needs a GIXSU_TOKEN secret
+    # (a fine-grained token with read access to the repository) and skips its steps without one
+    env:
+      GIXSU_TOKEN: ${{ secrets.GIXSU_TOKEN }}
     steps:
       - uses: actions/checkout@v4
 
+      - name: Without a GIXSU_TOKEN secret the service cannot be installed; the rest is skipped
+        if: env.GIXSU_TOKEN == ''
+        run: echo "no GIXSU_TOKEN: skipping the gixs end-to-end flow"
+
       - uses: pnpm/action-setup@v4
+        if: env.GIXSU_TOKEN != ''
 
       - uses: actions/setup-node@v4
+        if: env.GIXSU_TOKEN != ''
         with:
           node-version: 22
           cache: pnpm
 
       - uses: astral-sh/setup-uv@v6
+        if: env.GIXSU_TOKEN != ''
         with:
           python-version: "3.12"
 
       - run: pnpm install --frozen-lockfile
+        if: env.GIXSU_TOKEN != ''
 
       - name: The service, from gixsu's refactoring branch, with the shared package from this checkout
+        if: env.GIXSU_TOKEN != ''
         run: |
           uv venv service
           uv pip install --python service/bin/python torch --index-url https://download.pytorch.org/whl/cpu
           uv pip install --python service/bin/python ./packages/webkit-py
-          uv pip install --python service/bin/python "gixsu[web] @ git+https://github.com/AdvancedPhotonSource/gixsu.git@mc_refact"
+          uv pip install --python service/bin/python "gixsu[web] @ git+https://x-access-token:${GIXSU_TOKEN}@github.com/AdvancedPhotonSource/gixsu.git@mc_refact"
 
       - name: Build the app into the service's static folder, as a release wheel carries it
+        if: env.GIXSU_TOKEN != ''
         run: |
           pnpm --filter @beamline-web/app-gixs build
           static=$(service/bin/python -c "import os, gixsu.web; print(os.path.join(os.path.dirname(gixsu.web.__file__), 'static'))")
           node scripts/deploy-app.mjs gixs "$static"
 
       - name: Synthetic files, and the service over them
+        if: env.GIXSU_TOKEN != ''
         run: |
           service/bin/gixsu synthetic "$RUNNER_TEMP/data"
-          nohup service/bin/gixsu web --path "$RUNNER_TEMP/data" --port 8060 --no-dash --log-level warning > "$RUNNER_TEMP/service.log" 2>&1 &
+          nohup service/bin/gixsu web --path "$RUNNER_TEMP/data" --port 8060 --log-level warning > "$RUNNER_TEMP/service.log" 2>&1 &
           for i in $(seq 1 90); do curl -sf http://127.0.0.1:8060/api/health && break; sleep 1; done
           curl -sf http://127.0.0.1:8060/ | grep -q "assets/" || { echo "the page is not the built app"; cat "$RUNNER_TEMP/service.log"; exit 1; }
 
       - run: pnpm --filter @beamline-web/app-gixs exec playwright install --with-deps chromium
+        if: env.GIXSU_TOKEN != ''
 
       - name: The real-data flow against the service
+        if: env.GIXSU_TOKEN != ''
         env:
           GIXS_URL: http://127.0.0.1:8060
         run: pnpm --filter @beamline-web/app-gixs exec playwright test e2e/real-data.spec.ts

@@ -130,5 +130,6 @@ incidence-angle series as analysis tabs, Calibrate and Setup as side tabs. Long 
 as jobs with their progress in the message bar. The service is `gixsu web` (branch `mc_refact`
 of gixsu); `pnpm dev` proxies `/api` to its default port 8060, and
 `GIXS_URL=http://host:8060 pnpm --filter @beamline-web/app-gixs exec playwright test e2e/real-data.spec.ts`
-runs the flow over a running service, as CI does on `gixsu synthetic` data. A release is the tag
+runs the flow over a running service, as CI does on `gixsu synthetic` data (the job needs a
+`GIXSU_TOKEN` repository secret while gixsu's repository is private, and skips without one). A release is the tag
 `gixs-v<version>`, whose bundle gixsu's own release downloads into its wheel.
