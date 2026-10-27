@@ -80,3 +80,57 @@ jobs:
           assert answer.status_code == 200 and answer.json()["status"] == "ok", answer.text
           print("health behind /t:", answer.json())
           PY
+
+  e2e-xpcs:
+    name: xpcs app over a real service (synthetic data)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - uses: astral-sh/setup-uv@v6
+        with:
+          python-version: "3.12"
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: The service, from pyXpcsViewer's web branch, with the shared package from this checkout
+        run: |
+          uv venv service
+          uv pip install --python service/bin/python ./packages/webkit-py
+          uv pip install --python service/bin/python "xpcs-viewer[web] @ git+https://github.com/AdvancedPhotonSource/pyXpcsViewer.git@web"
+
+      - name: Build the app into the service's static folder, as a release wheel carries it
+        run: |
+          pnpm --filter @beamline-web/app-xpcs build
+          static=$(service/bin/python -c "import os, pyxpcsviewer.web; print(os.path.join(os.path.dirname(pyxpcsviewer.web.__file__), 'static'))")
+          node scripts/deploy-app.mjs xpcs "$static"
+
+      - name: Synthetic result files, and the service over them
+        run: |
+          service/bin/pyxpcsviewer-synthetic "$RUNNER_TEMP/data"
+          nohup service/bin/pyxpcsviewer-web "$RUNNER_TEMP/data" --port 8070 --log-level warning > "$RUNNER_TEMP/service.log" 2>&1 &
+          for i in $(seq 1 60); do curl -sf http://127.0.0.1:8070/api/health && break; sleep 1; done
+          curl -sf http://127.0.0.1:8070/ | grep -q "assets/" || { echo "the page is not the built app"; cat "$RUNNER_TEMP/service.log"; exit 1; }
+
+      - run: pnpm --filter @beamline-web/app-xpcs exec playwright install --with-deps chromium
+
+      - name: The real-data flow against the service
+        env:
+          XPCS_URL: http://127.0.0.1:8070
+        run: pnpm --filter @beamline-web/app-xpcs exec playwright test e2e/real-data.spec.ts
+
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: e2e-xpcs-report
+          path: |
+            apps/xpcs/test-results
+            ${{ runner.temp }}/service.log
+          if-no-files-found: ignore
