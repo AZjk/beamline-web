@@ -199,7 +199,9 @@ export function ArrayImage({
           aria-label="color bar"
         >
           {colorBarLabel ? <span className="py-1">{colorBarLabel}</span> : null}
-          <div className="min-h-0 flex-1">
+          {/* a grid cell stretches H5Web's color bar to the height it has: its gradient fills the
+              row between the bounds instead of collapsing to a hairline */}
+          <div className="grid min-h-0 flex-1">
             <ColorBar
               domain={safeDomain}
               scaleType={SCALE[scale]}
