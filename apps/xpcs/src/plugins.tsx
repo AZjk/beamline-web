@@ -3,14 +3,14 @@
 
 /** The tabs and panels of the xpcs app, registered with the kit's plugin registry. */
 
-import { PluginRegistry, definePlugin, type PluginProps } from "@beamline-web/ui";
+import { PluginRegistry, definePlugin } from "@beamline-web/ui";
 
 import { InttPanel } from "./panels/InttPanel";
 import { ProfilePanel } from "./panels/ProfilePanel";
 import { G2Tab } from "./tabs/G2Tab";
 import { HdfTab } from "./tabs/HdfTab";
-import { Pending } from "./tabs/Pending";
 import { TauqTab } from "./tabs/TauqTab";
+import { TwotimeTab } from "./tabs/TwotimeTab";
 
 export const registry = new PluginRegistry().register(
   definePlugin({ id: "g2", label: "g2", placement: "tab", order: 1, component: G2Tab }),
@@ -27,7 +27,7 @@ export const registry = new PluginRegistry().register(
     label: "Two-time",
     placement: "tab",
     order: 3,
-    component: (p: PluginProps) => <Pending {...p} what="The two-time tab" />,
+    component: TwotimeTab,
   }),
   definePlugin({ id: "hdf", label: "Metadata", placement: "tab", order: 4, component: HdfTab }),
   definePlugin({

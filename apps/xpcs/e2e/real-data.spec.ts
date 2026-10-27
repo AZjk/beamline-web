@@ -49,6 +49,22 @@ test("load, select, image, panels, fit, tau(q), metadata", async ({ page }) => {
   await page.getByRole("button", { name: "Fit τ(q)" }).click();
   await expect(page.getByText(/τ = a·q\^b/)).toBeVisible({ timeout: 30_000 });
 
+  // two-time: a two-time file, its C2 map and the g2 computed from it, the next bin with ]
+  await rows.filter({ hasText: "twotime" }).first().click();
+  await page.getByRole("tab", { name: "Two-time" }).click();
+  await expect(page.getByLabel("C2 map").locator("canvas")).toBeVisible({ timeout: 30_000 });
+  await expect(page.getByLabel("two-time g2 figure").locator(".plot-container")).toBeVisible({
+    timeout: 30_000,
+  });
+  const bin = page.getByLabel("two-time bin");
+  const before = await bin.inputValue();
+  await page.keyboard.press("]");
+  await expect(bin).not.toHaveValue(before);
+  await expect(page.getByLabel("C2 map").locator("canvas")).toBeVisible({ timeout: 30_000 });
+  await page.screenshot({
+    path: (process.env.XPCS_SHOT ?? "test-results/real-data.png").replace(/\.png$/, "-twotime.png"),
+  });
+
   await page.getByRole("tab", { name: "Metadata" }).click();
   await expect(page.locator("details summary").first()).toBeVisible({ timeout: 15_000 });
   await expect(page).toHaveURL(/file=/);
