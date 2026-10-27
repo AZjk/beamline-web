@@ -8,7 +8,7 @@
  * JSON must use the same rule.
  */
 
-import type { EllipseShape, Point, PolygonShape, Shape } from "./types";
+import type { EllipseShape, Point, PolygonShape, RectShape, Shape } from "./types";
 
 /** The even-odd rule. */
 export function pointInPolygon(x: number, y: number, points: readonly Point[]): boolean {
@@ -31,10 +31,14 @@ export function pointInEllipse(x: number, y: number, e: EllipseShape): boolean {
   return dx * dx + dy * dy <= 1;
 }
 
+export function pointInRect(x: number, y: number, r: RectShape): boolean {
+  return x >= r.x0 && x < r.x1 && y >= r.y0 && y < r.y1;
+}
+
 export function pointInShape(x: number, y: number, shape: Shape): boolean {
-  return shape.kind === "polygon"
-    ? pointInPolygon(x, y, shape.points)
-    : pointInEllipse(x, y, shape);
+  if (shape.kind === "polygon") return pointInPolygon(x, y, shape.points);
+  if (shape.kind === "rect") return pointInRect(x, y, shape);
+  return pointInEllipse(x, y, shape);
 }
 
 export interface Bounds {
@@ -53,6 +57,9 @@ export function shapeBounds(shape: Shape): Bounds {
       ymax: shape.cy + shape.ry,
     };
   }
+  if (shape.kind === "rect") {
+    return { xmin: shape.x0, xmax: shape.x1, ymin: shape.y0, ymax: shape.y1 };
+  }
   const b: Bounds = { xmin: Infinity, xmax: -Infinity, ymin: Infinity, ymax: -Infinity };
   for (const p of shape.points) {
     b.xmin = Math.min(b.xmin, p.x);
@@ -63,9 +70,29 @@ export function shapeBounds(shape: Shape): Bounds {
   return b;
 }
 
-/** The points a user drags: a polygon's vertices; an ellipse's center, right and top. */
+/** A rect with its corners ordered. */
+export function normalizedRect(r: RectShape): RectShape {
+  return {
+    ...r,
+    x0: Math.min(r.x0, r.x1),
+    x1: Math.max(r.x0, r.x1),
+    y0: Math.min(r.y0, r.y1),
+    y1: Math.max(r.y0, r.y1),
+  };
+}
+
+/** The points a user drags: a polygon's vertices; an ellipse's center, right and top; a
+ * rect's four corners (x0,y0), (x1,y0), (x1,y1), (x0,y1). */
 export function handlesOf(shape: Shape): Point[] {
   if (shape.kind === "polygon") return shape.points;
+  if (shape.kind === "rect") {
+    return [
+      { x: shape.x0, y: shape.y0 },
+      { x: shape.x1, y: shape.y0 },
+      { x: shape.x1, y: shape.y1 },
+      { x: shape.x0, y: shape.y1 },
+    ];
+  }
   return [
     { x: shape.cx, y: shape.cy },
     { x: shape.cx + shape.rx, y: shape.cy },
@@ -78,6 +105,12 @@ export function withHandleAt(shape: Shape, index: number, p: Point): Shape {
   if (shape.kind === "polygon") {
     return { ...shape, points: shape.points.map((q, i) => (i === index ? p : q)) };
   }
+  if (shape.kind === "rect") {
+    // the dragged corner moves, the opposite one stays
+    const xs = index === 0 || index === 3 ? { x0: p.x, x1: shape.x1 } : { x0: shape.x0, x1: p.x };
+    const ys = index === 0 || index === 1 ? { y0: p.y, y1: shape.y1 } : { y0: shape.y0, y1: p.y };
+    return normalizedRect({ ...shape, ...xs, ...ys });
+  }
   if (index === 0) return { ...shape, cx: p.x, cy: p.y };
   if (index === 1) return { ...shape, rx: Math.abs(p.x - shape.cx) };
   return { ...shape, ry: Math.abs(p.y - shape.cy) };
@@ -87,7 +120,19 @@ export function translated(shape: Shape, dx: number, dy: number): Shape {
   if (shape.kind === "polygon") {
     return { ...shape, points: shape.points.map((p) => ({ x: p.x + dx, y: p.y + dy })) };
   }
+  if (shape.kind === "rect") {
+    return { ...shape, x0: shape.x0 + dx, x1: shape.x1 + dx, y0: shape.y0 + dy, y1: shape.y1 + dy };
+  }
   return { ...shape, cx: shape.cx + dx, cy: shape.cy + dy };
+}
+
+/** The shape reflected in x (x → −x): the twin of a mirrored ROI. */
+export function mirroredX(shape: Shape): Shape {
+  if (shape.kind === "polygon") {
+    return { ...shape, points: shape.points.map((p) => ({ x: -p.x, y: p.y })) };
+  }
+  if (shape.kind === "rect") return { ...shape, x0: -shape.x1, x1: -shape.x0 };
+  return { ...shape, cx: -shape.cx };
 }
 
 function fillSpan(
@@ -118,6 +163,13 @@ function fillEllipse(mask: Uint8Array, rows: number, cols: number, e: EllipseSha
   }
 }
 
+function fillRect(mask: Uint8Array, rows: number, cols: number, box: RectShape, value: number) {
+  const r = normalizedRect(box);
+  const r0 = Math.max(0, Math.ceil(r.y0));
+  const r1 = Math.min(rows - 1, Math.ceil(r.y1) - 1);
+  for (let row = r0; row <= r1; row += 1) fillSpan(mask, cols, row, r.x0, r.x1, value);
+}
+
 function fillPolygon(mask: Uint8Array, rows: number, cols: number, p: PolygonShape, value: number) {
   const pts = p.points;
   if (pts.length < 3) return;
@@ -142,6 +194,7 @@ function fillPolygon(mask: Uint8Array, rows: number, cols: number, p: PolygonSha
 /** Marks the pixels of `mask` (rows × cols, row-major) whose center the shape covers. */
 export function fillShape(mask: Uint8Array, rows: number, cols: number, shape: Shape, value = 1) {
   if (shape.kind === "ellipse") fillEllipse(mask, rows, cols, shape, value);
+  else if (shape.kind === "rect") fillRect(mask, rows, cols, shape, value);
   else fillPolygon(mask, rows, cols, shape, value);
 }
 

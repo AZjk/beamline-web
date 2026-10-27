@@ -5,15 +5,17 @@ import { describe, expect, it } from "vitest";
 
 import {
   handlesOf,
+  mirroredX,
   pointInEllipse,
   pointInPolygon,
+  pointInRect,
   pointInShape,
   rasterize,
   shapeBounds,
   translated,
   withHandleAt,
 } from "./geometry";
-import type { EllipseShape, Point, PolygonShape, Shape } from "./types";
+import type { EllipseShape, Point, PolygonShape, RectShape, Shape } from "./types";
 
 const square: PolygonShape = {
   id: "sq",
@@ -161,5 +163,37 @@ describe("handles", () => {
       ymax: 9,
     });
     expect(shapeBounds(translated(square, 1, 1))).toEqual({ xmin: 3, xmax: 7, ymin: 3, ymax: 7 });
+  });
+});
+
+describe("rects", () => {
+  const box: RectShape = { id: "b", kind: "rect", x0: 2, x1: 6, y0: 1, y1: 4 };
+
+  it("half-open like the polygon rule, and the same mask as its polygon", () => {
+    expect(pointInRect(2, 1, box)).toBe(true);
+    expect(pointInRect(6, 1, box)).toBe(false);
+    expect(pointInRect(3, 4, box)).toBe(false);
+    const asPolygon: PolygonShape = {
+      id: "p",
+      kind: "polygon",
+      points: [
+        { x: 2, y: 1 },
+        { x: 6, y: 1 },
+        { x: 6, y: 4 },
+        { x: 2, y: 4 },
+      ],
+    };
+    expect(Array.from(rasterize([box], 8, 8))).toEqual(Array.from(rasterize([asPolygon], 8, 8)));
+    expect(rasterize([box], 8, 8).reduce<number>((n, v) => n + v, 0)).toBe(12);
+  });
+
+  it("corner handles keep the opposite corner and the order", () => {
+    expect(handlesOf(box)).toHaveLength(4);
+    const dragged = withHandleAt(box, 2, { x: 1, y: 0 }) as RectShape; // the (x1, y1) corner past (x0, y0)
+    expect([dragged.x0, dragged.x1, dragged.y0, dragged.y1]).toEqual([1, 2, 0, 1]);
+    expect(translated(box, 1, 1)).toMatchObject({ x0: 3, x1: 7, y0: 2, y1: 5 });
+    expect(mirroredX(box)).toMatchObject({ x0: -6, x1: -2, y0: 1, y1: 4 });
+    expect(mirroredX(mirroredX(box))).toEqual(box);
+    expect(shapeBounds(box)).toEqual({ xmin: 2, xmax: 6, ymin: 1, ymax: 4 });
   });
 });

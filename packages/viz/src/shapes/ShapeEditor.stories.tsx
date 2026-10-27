@@ -44,7 +44,7 @@ const INITIAL: Shape[] = [
   },
 ];
 
-const TOOLS: ShapeTool[] = ["select", "polygon", "ellipse"];
+const TOOLS: ShapeTool[] = ["select", "polygon", "ellipse", "rect"];
 
 function Spike() {
   const [tool, setTool] = useState<ShapeTool>("polygon");
@@ -117,6 +117,10 @@ function Spike() {
             selectedId={selectedId}
             onSelect={setSelectedId}
             onDrawn={() => setTool("select")}
+            styles={{
+              arm: { label: "arm", color: "#2a78d6", mirrorX: true },
+              beamstop: { label: "beam stop" },
+            }}
           />
         </ArrayImage>
       </div>

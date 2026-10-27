@@ -15,16 +15,22 @@ export type { ColorStop, ColormapName, H5WebColorMap } from "./colormaps";
 export { ArrayImage, toNdArray } from "./image/ArrayImage";
 export type { ArrayImageProps, ImageExtent, ImageScale } from "./image/ArrayImage";
 export { DetectorImage } from "./image/DetectorImage";
+export { DataOverlays } from "./image/DataOverlays";
+export type { OverlayItem } from "./image/DataOverlays";
 export { OverlayMesh } from "./image/OverlayMesh";
 export type { OverlayMeshProps } from "./image/OverlayMesh";
 export type { DetectorImageProps, LabelOverlay } from "./image/DetectorImage";
+export { levelsAt, percentile, positivePart, sortedFinite } from "./image/levels";
 export { finiteRange, sampledExtent, sampledIndex, valueAt } from "./image/sampling";
 export type { Sampling } from "./image/sampling";
 export {
   fillShape,
   handlesOf,
+  mirroredX,
+  normalizedRect,
   pointInEllipse,
   pointInPolygon,
+  pointInRect,
   pointInShape,
   rasterize,
   shapeBounds,
@@ -37,7 +43,15 @@ export type { MaskMeshProps } from "./shapes/MaskMesh";
 export { editorInteractions } from "./shapes/interactions";
 export { ShapeEditor } from "./shapes/ShapeEditor";
 export type { ShapeEditorProps } from "./shapes/ShapeEditor";
-export type { EllipseShape, Point, PolygonShape, Shape, ShapeTool } from "./shapes/types";
+export type {
+  EllipseShape,
+  Point,
+  PolygonShape,
+  RectShape,
+  Shape,
+  ShapeStyle,
+  ShapeTool,
+} from "./shapes/types";
 export { Plot, loadPlotly, usePlotly } from "./plot/Plot";
 export type { PlotProps } from "./plot/Plot";
 export {
@@ -72,5 +86,6 @@ export type {
   LayoutAxis,
   PlotData,
   PlotMouseEvent,
+  PlotRelayoutEvent,
 } from "plotly.js";
 export type AxisAnchor = import("plotly.js").LayoutAxis["anchor"];

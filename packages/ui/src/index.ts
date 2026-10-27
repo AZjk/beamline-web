@@ -12,6 +12,8 @@ export { NumberField } from "./components/NumberField";
 export { SelectField } from "./components/SelectField";
 export type { SelectOption } from "./components/SelectField";
 export { Field, Hint, Kbd, SectionTitle, Toolbar } from "./components/Field";
+export { DataTable } from "./components/DataTable";
+export type { Column, ColumnOption, DataTableProps } from "./components/DataTable";
 export { Tabs } from "./components/Tabs";
 export type { TabItem, TabsProps } from "./components/Tabs";
 export { Pane, PaneGroup, PaneHandle } from "./components/Panes";

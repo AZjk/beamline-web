@@ -3,7 +3,8 @@
 
 /**
  * Shapes drawn over an array, in data coordinates (detector pixels: a pixel's center sits at
- * integer coordinates). The JSON of a shape list is the ROI wire format the tools exchange.
+ * integer coordinates; or the units of a remapped view). The JSON of a shape list is the ROI
+ * wire format the tools exchange.
  */
 
 export interface Point {
@@ -27,6 +28,25 @@ export interface EllipseShape {
   ry: number;
 }
 
-export type Shape = PolygonShape | EllipseShape;
+/** An axis-aligned box: x0 <= x1, y0 <= y1. */
+export interface RectShape {
+  id: string;
+  kind: "rect";
+  x0: number;
+  x1: number;
+  y0: number;
+  y1: number;
+}
 
-export type ShapeTool = "select" | "polygon" | "ellipse";
+export type Shape = PolygonShape | EllipseShape | RectShape;
+
+export type ShapeTool = "select" | "polygon" | "ellipse" | "rect";
+
+/** How an app draws one shape: its color, a label at its top left, dotted when disabled, and
+ * a twin reflected in x (x → −x) drawn dashed, which is not editable. */
+export interface ShapeStyle {
+  color?: string;
+  label?: string;
+  dashed?: boolean;
+  mirrorX?: boolean;
+}

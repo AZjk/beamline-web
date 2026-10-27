@@ -1,0 +1,5760 @@
+{
+  "components": {
+    "schemas": {
+      "Axis": {
+        "description": "Evenly spaced bin centers: start + i * step, i < n.",
+        "properties": {
+          "n": {
+            "title": "N",
+            "type": "integer"
+          },
+          "start": {
+            "title": "Start",
+            "type": "number"
+          },
+          "step": {
+            "title": "Step",
+            "type": "number"
+          }
+        },
+        "required": [
+          "start",
+          "step",
+          "n"
+        ],
+        "title": "Axis",
+        "type": "object"
+      },
+      "BeamCenterRequest": {
+        "properties": {
+          "box_size": {
+            "default": 256,
+            "title": "Box Size",
+            "type": "integer"
+          },
+          "context": {
+            "$ref": "#/components/schemas/Context"
+          },
+          "file": {
+            "title": "File",
+            "type": "string"
+          },
+          "half_width": {
+            "default": 15,
+            "title": "Half Width",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "file"
+        ],
+        "title": "BeamCenterRequest",
+        "type": "object"
+      },
+      "Calibration": {
+        "additionalProperties": true,
+        "description": "A calibration's result: ``apply`` holds the overrides per file that put it to use.",
+        "properties": {
+          "apply": {
+            "additionalProperties": {
+              "additionalProperties": {
+                "type": "number"
+              },
+              "type": "object"
+            },
+            "title": "Apply",
+            "type": "object"
+          },
+          "kind": {
+            "title": "Kind",
+            "type": "string"
+          },
+          "overlays": {
+            "items": {
+              "$ref": "#/components/schemas/OverlayIn"
+            },
+            "title": "Overlays",
+            "type": "array"
+          },
+          "text": {
+            "description": "the result in a few lines",
+            "title": "Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "kind",
+          "apply",
+          "overlays",
+          "text"
+        ],
+        "title": "Calibration",
+        "type": "object"
+      },
+      "Context": {
+        "description": "The processing and the geometry overrides ({file id: {metadata key: value}}) of a request.",
+        "properties": {
+          "overrides": {
+            "additionalProperties": {
+              "additionalProperties": {
+                "anyOf": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "type": "object"
+            },
+            "title": "Overrides",
+            "type": "object"
+          },
+          "processing": {
+            "$ref": "#/components/schemas/ProcessingIn"
+          }
+        },
+        "title": "Context",
+        "type": "object"
+      },
+      "Crystallinity": {
+        "properties": {
+          "error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error"
+          },
+          "reference": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reference"
+          },
+          "rows": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "title": "Rows",
+            "type": "array"
+          }
+        },
+        "required": [
+          "rows",
+          "reference",
+          "error"
+        ],
+        "title": "Crystallinity",
+        "type": "object"
+      },
+      "CrystallinityRequest": {
+        "properties": {
+          "reference": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reference"
+          },
+          "rows": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "title": "Rows",
+            "type": "array"
+          }
+        },
+        "required": [
+          "rows"
+        ],
+        "title": "CrystallinityRequest",
+        "type": "object"
+      },
+      "Curve": {
+        "properties": {
+          "file": {
+            "title": "File",
+            "type": "string"
+          },
+          "file_label": {
+            "title": "File Label",
+            "type": "string"
+          },
+          "frames": {
+            "title": "Frames",
+            "type": "string"
+          },
+          "level": {
+            "title": "Level",
+            "type": "string"
+          },
+          "pixels": {
+            "items": {
+              "type": "number"
+            },
+            "title": "Pixels",
+            "type": "array"
+          },
+          "roi_id": {
+            "title": "Roi Id",
+            "type": "string"
+          },
+          "roi_name": {
+            "title": "Roi Name",
+            "type": "string"
+          },
+          "roi_text": {
+            "title": "Roi Text",
+            "type": "string"
+          },
+          "sigma": {
+            "anyOf": [
+              {
+                "items": {
+                  "anyOf": [
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sigma"
+          },
+          "x": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "title": "X",
+            "type": "array"
+          },
+          "x_label": {
+            "title": "X Label",
+            "type": "string"
+          },
+          "y": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "title": "Y",
+            "type": "array"
+          },
+          "y_label": {
+            "title": "Y Label",
+            "type": "string"
+          }
+        },
+        "required": [
+          "x",
+          "y",
+          "sigma",
+          "pixels",
+          "x_label",
+          "y_label",
+          "file",
+          "file_label",
+          "roi_id",
+          "roi_name",
+          "roi_text",
+          "level",
+          "frames"
+        ],
+        "title": "Curve",
+        "type": "object"
+      },
+      "Cuts": {
+        "properties": {
+          "curves": {
+            "items": {
+              "$ref": "#/components/schemas/Curve"
+            },
+            "title": "Curves",
+            "type": "array"
+          },
+          "errors": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Errors",
+            "type": "array"
+          }
+        },
+        "required": [
+          "curves",
+          "errors"
+        ],
+        "title": "Cuts",
+        "type": "object"
+      },
+      "CutsRequest": {
+        "properties": {
+          "context": {
+            "$ref": "#/components/schemas/Context"
+          },
+          "files": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Files",
+            "type": "array"
+          },
+          "rois": {
+            "items": {
+              "$ref": "#/components/schemas/Roi"
+            },
+            "title": "Rois",
+            "type": "array"
+          }
+        },
+        "required": [
+          "files",
+          "rois"
+        ],
+        "title": "CutsRequest",
+        "type": "object"
+      },
+      "FieldInfo": {
+        "properties": {
+          "factor": {
+            "default": 1.0,
+            "title": "Factor",
+            "type": "number"
+          },
+          "key": {
+            "title": "Key",
+            "type": "string"
+          },
+          "kind": {
+            "default": "number",
+            "title": "Kind",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "unit": {
+            "title": "Unit",
+            "type": "string"
+          }
+        },
+        "required": [
+          "key",
+          "label",
+          "unit"
+        ],
+        "title": "FieldInfo",
+        "type": "object"
+      },
+      "FileList": {
+        "properties": {
+          "files": {
+            "items": {
+              "$ref": "#/components/schemas/FileRow"
+            },
+            "title": "Files",
+            "type": "array"
+          },
+          "total": {
+            "description": "files matching the pattern, of which at most `limit` are listed",
+            "title": "Total",
+            "type": "integer"
+          },
+          "version": {
+            "description": "grows whenever a scan finds different files",
+            "title": "Version",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "files",
+          "total",
+          "version"
+        ],
+        "title": "FileList",
+        "type": "object"
+      },
+      "FileRow": {
+        "properties": {
+          "folder": {
+            "title": "Folder",
+            "type": "string"
+          },
+          "id": {
+            "description": "the file's path relative to the folder: its name in every other route",
+            "title": "Id",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "modified": {
+            "title": "Modified",
+            "type": "string"
+          },
+          "mtime": {
+            "title": "Mtime",
+            "type": "number"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "label",
+          "name",
+          "folder",
+          "modified",
+          "mtime"
+        ],
+        "title": "FileRow",
+        "type": "object"
+      },
+      "FitCut": {
+        "additionalProperties": true,
+        "properties": {
+          "K": {
+            "title": "K",
+            "type": "number"
+          },
+          "axis": {
+            "title": "Axis",
+            "type": "string"
+          },
+          "chi2_red": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Chi2 Red"
+          },
+          "data": {
+            "additionalProperties": true,
+            "title": "Data",
+            "type": "object"
+          },
+          "file": {
+            "title": "File",
+            "type": "string"
+          },
+          "file_label": {
+            "title": "File Label",
+            "type": "string"
+          },
+          "model": {
+            "additionalProperties": true,
+            "title": "Model",
+            "type": "object"
+          },
+          "peaks": {
+            "items": {
+              "$ref": "#/components/schemas/PeakRow"
+            },
+            "title": "Peaks",
+            "type": "array"
+          },
+          "q_axis": {
+            "title": "Q Axis",
+            "type": "boolean"
+          },
+          "residual": {
+            "additionalProperties": true,
+            "title": "Residual",
+            "type": "object"
+          },
+          "roi_id": {
+            "title": "Roi Id",
+            "type": "string"
+          },
+          "roi_name": {
+            "title": "Roi Name",
+            "type": "string"
+          },
+          "summary": {
+            "title": "Summary",
+            "type": "string"
+          },
+          "weighted": {
+            "title": "Weighted",
+            "type": "boolean"
+          },
+          "window": {
+            "items": {
+              "type": "number"
+            },
+            "title": "Window",
+            "type": "array"
+          },
+          "x_label": {
+            "title": "X Label",
+            "type": "string"
+          },
+          "y_label": {
+            "title": "Y Label",
+            "type": "string"
+          }
+        },
+        "required": [
+          "file",
+          "file_label",
+          "roi_id",
+          "roi_name",
+          "x_label",
+          "y_label",
+          "axis",
+          "q_axis",
+          "data",
+          "window",
+          "model",
+          "residual",
+          "peaks",
+          "weighted",
+          "K",
+          "summary"
+        ],
+        "title": "FitCut",
+        "type": "object"
+      },
+      "FitCutRequest": {
+        "properties": {
+          "K": {
+            "default": 0.9,
+            "title": "K",
+            "type": "number"
+          },
+          "context": {
+            "$ref": "#/components/schemas/Context"
+          },
+          "file": {
+            "title": "File",
+            "type": "string"
+          },
+          "nbg": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "string"
+              }
+            ],
+            "default": 2,
+            "title": "Nbg"
+          },
+          "peaks": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "items": {
+                  "type": "number"
+                },
+                "type": "array"
+              }
+            ],
+            "default": 1,
+            "title": "Peaks"
+          },
+          "roi": {
+            "$ref": "#/components/schemas/Roi"
+          },
+          "shape": {
+            "default": "pv",
+            "title": "Shape",
+            "type": "string"
+          },
+          "shared": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Shared",
+            "type": "array"
+          },
+          "window": {
+            "anyOf": [
+              {
+                "items": {
+                  "anyOf": [
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Window"
+          }
+        },
+        "required": [
+          "file",
+          "roi"
+        ],
+        "title": "FitCutRequest",
+        "type": "object"
+      },
+      "FrameSeries": {
+        "additionalProperties": true,
+        "properties": {
+          "file_label": {
+            "title": "File Label",
+            "type": "string"
+          },
+          "frames": {
+            "items": {
+              "type": "integer"
+            },
+            "title": "Frames",
+            "type": "array"
+          },
+          "intensity": {
+            "items": {
+              "items": {
+                "anyOf": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "type": "array"
+            },
+            "title": "Intensity",
+            "type": "array"
+          },
+          "level": {
+            "title": "Level",
+            "type": "string"
+          },
+          "roi_name": {
+            "title": "Roi Name",
+            "type": "string"
+          },
+          "time": {
+            "anyOf": [
+              {
+                "items": {
+                  "anyOf": [
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Time"
+          },
+          "total": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "title": "Total",
+            "type": "array"
+          },
+          "total_sigma": {
+            "anyOf": [
+              {
+                "items": {
+                  "anyOf": [
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Total Sigma"
+          },
+          "tracked": {
+            "anyOf": [
+              {
+                "additionalProperties": {
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "type": "array"
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tracked"
+          },
+          "x": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "title": "X",
+            "type": "array"
+          },
+          "x_label": {
+            "title": "X Label",
+            "type": "string"
+          }
+        },
+        "required": [
+          "file_label",
+          "roi_name",
+          "x",
+          "x_label",
+          "frames",
+          "intensity",
+          "level",
+          "total"
+        ],
+        "title": "FrameSeries",
+        "type": "object"
+      },
+      "GeometryRequest": {
+        "description": "Apply edited geometry values to files: the overrides after it.",
+        "properties": {
+          "edited": {
+            "additionalProperties": {
+              "type": "number"
+            },
+            "title": "Edited",
+            "type": "object"
+          },
+          "overrides": {
+            "additionalProperties": {
+              "additionalProperties": {
+                "anyOf": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "type": "object"
+            },
+            "title": "Overrides",
+            "type": "object"
+          },
+          "targets": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Targets",
+            "type": "array"
+          }
+        },
+        "required": [
+          "overrides",
+          "targets",
+          "edited"
+        ],
+        "title": "GeometryRequest",
+        "type": "object"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "title": "Detail",
+            "type": "array"
+          }
+        },
+        "title": "HTTPValidationError",
+        "type": "object"
+      },
+      "Health": {
+        "description": "The answer of ``GET /api/health``.",
+        "properties": {
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "schema_version": {
+            "title": "Schema Version",
+            "type": "string"
+          },
+          "status": {
+            "default": "ok",
+            "title": "Status",
+            "type": "string"
+          },
+          "version": {
+            "title": "Version",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "version",
+          "schema_version"
+        ],
+        "title": "Health",
+        "type": "object"
+      },
+      "ImageMeta": {
+        "description": "What the binary image route sends in its X-Array-Meta header.",
+        "properties": {
+          "binning": {
+            "title": "Binning",
+            "type": "integer"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "lines": {
+            "items": {
+              "$ref": "#/components/schemas/Line"
+            },
+            "title": "Lines",
+            "type": "array"
+          },
+          "markers": {
+            "items": {
+              "$ref": "#/components/schemas/Marker"
+            },
+            "title": "Markers",
+            "type": "array"
+          },
+          "shape": {
+            "description": "rows, columns of the array sent",
+            "items": {
+              "type": "integer"
+            },
+            "title": "Shape",
+            "type": "array"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "valid": {
+            "description": "finite values in the array",
+            "title": "Valid",
+            "type": "integer"
+          },
+          "view": {
+            "title": "View",
+            "type": "string"
+          },
+          "x": {
+            "$ref": "#/components/schemas/Axis"
+          },
+          "x_label": {
+            "title": "X Label",
+            "type": "string"
+          },
+          "x_reversed": {
+            "title": "X Reversed",
+            "type": "boolean"
+          },
+          "y": {
+            "$ref": "#/components/schemas/Axis"
+          },
+          "y_label": {
+            "title": "Y Label",
+            "type": "string"
+          },
+          "y_reversed": {
+            "title": "Y Reversed",
+            "type": "boolean"
+          },
+          "zmax": {
+            "title": "Zmax",
+            "type": "number"
+          },
+          "zmin": {
+            "title": "Zmin",
+            "type": "number"
+          }
+        },
+        "required": [
+          "id",
+          "view",
+          "x",
+          "y",
+          "x_label",
+          "y_label",
+          "markers",
+          "lines",
+          "binning",
+          "title",
+          "x_reversed",
+          "y_reversed",
+          "shape",
+          "zmin",
+          "zmax",
+          "valid"
+        ],
+        "title": "ImageMeta",
+        "type": "object"
+      },
+      "Incidence": {
+        "additionalProperties": true,
+        "properties": {
+          "alpha_c": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Alpha C"
+          },
+          "alpha_i": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "title": "Alpha I",
+            "type": "array"
+          },
+          "depth": {
+            "anyOf": [
+              {
+                "items": {
+                  "anyOf": [
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Depth"
+          },
+          "intensity": {
+            "items": {
+              "items": {
+                "anyOf": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "type": "array"
+            },
+            "title": "Intensity",
+            "type": "array"
+          },
+          "layer": {
+            "title": "Layer",
+            "type": "string"
+          },
+          "level": {
+            "title": "Level",
+            "type": "string"
+          },
+          "peak_alpha_i": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Peak Alpha I"
+          },
+          "roi_name": {
+            "title": "Roi Name",
+            "type": "string"
+          },
+          "summary": {
+            "title": "Summary",
+            "type": "string"
+          },
+          "versus": {
+            "additionalProperties": true,
+            "title": "Versus",
+            "type": "object"
+          },
+          "x": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "title": "X",
+            "type": "array"
+          },
+          "x_label": {
+            "title": "X Label",
+            "type": "string"
+          }
+        },
+        "required": [
+          "alpha_i",
+          "x",
+          "x_label",
+          "intensity",
+          "versus",
+          "level",
+          "layer",
+          "summary",
+          "roi_name"
+        ],
+        "title": "Incidence",
+        "type": "object"
+      },
+      "IncidenceRequest": {
+        "properties": {
+          "alpha_f_deg": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Alpha F Deg"
+          },
+          "context": {
+            "$ref": "#/components/schemas/Context"
+          },
+          "files": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Files",
+            "type": "array"
+          },
+          "layer": {
+            "default": "film",
+            "title": "Layer",
+            "type": "string"
+          },
+          "roi": {
+            "$ref": "#/components/schemas/Roi"
+          },
+          "x_range": {
+            "anyOf": [
+              {
+                "items": {
+                  "anyOf": [
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "X Range"
+          }
+        },
+        "required": [
+          "files",
+          "roi"
+        ],
+        "title": "IncidenceRequest",
+        "type": "object"
+      },
+      "Indexed": {
+        "additionalProperties": true,
+        "properties": {
+          "lattice": {
+            "additionalProperties": true,
+            "title": "Lattice",
+            "type": "object"
+          },
+          "overlays": {
+            "items": {
+              "$ref": "#/components/schemas/OverlayIn"
+            },
+            "title": "Overlays",
+            "type": "array"
+          },
+          "rows": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "title": "Rows",
+            "type": "array"
+          },
+          "settings": {
+            "additionalProperties": true,
+            "title": "Settings",
+            "type": "object"
+          }
+        },
+        "required": [
+          "rows",
+          "settings",
+          "lattice",
+          "overlays"
+        ],
+        "title": "Indexed",
+        "type": "object"
+      },
+      "Info": {
+        "description": "What the page needs once: the folder, the choices of every control, the setup in use.",
+        "properties": {
+          "branch_styles": {
+            "additionalProperties": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "title": "Branch Styles",
+            "type": "object"
+          },
+          "calibrants": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Calibrants",
+            "type": "array"
+          },
+          "device": {
+            "title": "Device",
+            "type": "string"
+          },
+          "geometry_fields": {
+            "items": {
+              "$ref": "#/components/schemas/FieldInfo"
+            },
+            "title": "Geometry Fields",
+            "type": "array"
+          },
+          "level_help": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "title": "Level Help",
+            "type": "object"
+          },
+          "level_tooltip": {
+            "title": "Level Tooltip",
+            "type": "string"
+          },
+          "levels": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Levels",
+            "type": "array"
+          },
+          "max_image_px": {
+            "title": "Max Image Px",
+            "type": "integer"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "normalizations": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "title": "Normalizations",
+            "type": "object"
+          },
+          "peak_shapes": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "title": "Peak Shapes",
+            "type": "object"
+          },
+          "presets": {
+            "additionalProperties": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "description": "the standard cuts: label → new_roi arguments",
+            "title": "Presets",
+            "type": "object"
+          },
+          "root": {
+            "title": "Root",
+            "type": "string"
+          },
+          "sample_fields": {
+            "items": {
+              "$ref": "#/components/schemas/FieldInfo"
+            },
+            "title": "Sample Fields",
+            "type": "array"
+          },
+          "schema_version": {
+            "title": "Schema Version",
+            "type": "string"
+          },
+          "setup": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SetupInfo"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "the app-wide setup file (--workflow), the start of every session"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "version": {
+            "title": "Version",
+            "type": "string"
+          },
+          "views": {
+            "items": {
+              "$ref": "#/components/schemas/ViewInfo"
+            },
+            "title": "Views",
+            "type": "array"
+          }
+        },
+        "required": [
+          "name",
+          "title",
+          "version",
+          "schema_version",
+          "root",
+          "views",
+          "levels",
+          "level_help",
+          "level_tooltip",
+          "normalizations",
+          "geometry_fields",
+          "sample_fields",
+          "peak_shapes",
+          "calibrants",
+          "branch_styles",
+          "presets",
+          "max_image_px",
+          "device"
+        ],
+        "title": "Info",
+        "type": "object"
+      },
+      "JobState": {
+        "description": "What a page sees of a job.",
+        "properties": {
+          "created": {
+            "title": "Created",
+            "type": "number"
+          },
+          "done": {
+            "default": 0,
+            "description": "steps done",
+            "title": "Done",
+            "type": "integer"
+          },
+          "error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "why it failed",
+            "title": "Error"
+          },
+          "finished": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Finished"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "message": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "the step under way",
+            "title": "Message"
+          },
+          "name": {
+            "description": "what the job does, for the page's message bar",
+            "title": "Name",
+            "type": "string"
+          },
+          "result": {
+            "description": "what the job returned, once done",
+            "title": "Result"
+          },
+          "session": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "the session that started it",
+            "title": "Session"
+          },
+          "started": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Started"
+          },
+          "status": {
+            "enum": [
+              "queued",
+              "running",
+              "done",
+              "failed",
+              "cancelled"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "total": {
+            "default": 0,
+            "description": "steps in all; 0 while unknown",
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "status",
+          "created"
+        ],
+        "title": "JobState",
+        "type": "object"
+      },
+      "LatticeRequest": {
+        "properties": {
+          "beta": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Beta"
+          },
+          "branches": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Branches",
+            "type": "array"
+          },
+          "centering": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Centering"
+          },
+          "context": {
+            "$ref": "#/components/schemas/Context"
+          },
+          "delta": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Delta"
+          },
+          "file": {
+            "title": "File",
+            "type": "string"
+          },
+          "lattice": {
+            "description": "a, b, c, alpha, beta, gamma; c None for a 2-D lattice",
+            "items": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "title": "Lattice",
+            "type": "array"
+          },
+          "plane": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "integer"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Plane"
+          },
+          "q_max": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Q Max"
+          },
+          "space_group": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Space Group"
+          },
+          "uvw": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "number"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Uvw"
+          }
+        },
+        "required": [
+          "file",
+          "lattice"
+        ],
+        "title": "LatticeRequest",
+        "type": "object"
+      },
+      "Line": {
+        "properties": {
+          "dash": {
+            "default": "solid",
+            "title": "Dash",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "x": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "title": "X",
+            "type": "array"
+          },
+          "y": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "title": "Y",
+            "type": "array"
+          }
+        },
+        "required": [
+          "name",
+          "x",
+          "y"
+        ],
+        "title": "Line",
+        "type": "object"
+      },
+      "Marker": {
+        "properties": {
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "x": {
+            "title": "X",
+            "type": "number"
+          },
+          "y": {
+            "title": "Y",
+            "type": "number"
+          }
+        },
+        "required": [
+          "name",
+          "x",
+          "y"
+        ],
+        "title": "Marker",
+        "type": "object"
+      },
+      "MetadataJsonRequest": {
+        "properties": {
+          "overrides": {
+            "additionalProperties": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "title": "Overrides",
+            "type": "object"
+          }
+        },
+        "title": "MetadataJsonRequest",
+        "type": "object"
+      },
+      "OverlayIn": {
+        "additionalProperties": true,
+        "description": "An overlay as the tools return them: detector rows and columns (None between segments).",
+        "properties": {
+          "color": {
+            "default": "#ffffff",
+            "title": "Color",
+            "type": "string"
+          },
+          "cols": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "title": "Cols",
+            "type": "array"
+          },
+          "dash": {
+            "default": "solid",
+            "title": "Dash",
+            "type": "string"
+          },
+          "file": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "File"
+          },
+          "mode": {
+            "default": "markers",
+            "title": "Mode",
+            "type": "string"
+          },
+          "name": {
+            "default": "",
+            "title": "Name",
+            "type": "string"
+          },
+          "rows": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "title": "Rows",
+            "type": "array"
+          },
+          "size": {
+            "default": 10,
+            "title": "Size",
+            "type": "number"
+          },
+          "symbol": {
+            "default": "circle-open",
+            "title": "Symbol",
+            "type": "string"
+          },
+          "text": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Text"
+          }
+        },
+        "required": [
+          "rows",
+          "cols"
+        ],
+        "title": "OverlayIn",
+        "type": "object"
+      },
+      "OverlayTrace": {
+        "description": "An overlay in the coordinates of a view.",
+        "properties": {
+          "color": {
+            "title": "Color",
+            "type": "string"
+          },
+          "dash": {
+            "title": "Dash",
+            "type": "string"
+          },
+          "mode": {
+            "title": "Mode",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "size": {
+            "title": "Size",
+            "type": "number"
+          },
+          "symbol": {
+            "title": "Symbol",
+            "type": "string"
+          },
+          "text": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Text"
+          },
+          "x": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "title": "X",
+            "type": "array"
+          },
+          "y": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "title": "Y",
+            "type": "array"
+          }
+        },
+        "required": [
+          "name",
+          "x",
+          "y",
+          "mode",
+          "symbol",
+          "color",
+          "size",
+          "dash"
+        ],
+        "title": "OverlayTrace",
+        "type": "object"
+      },
+      "OverlaysRequest": {
+        "properties": {
+          "context": {
+            "$ref": "#/components/schemas/Context"
+          },
+          "overlays": {
+            "items": {
+              "$ref": "#/components/schemas/OverlayIn"
+            },
+            "title": "Overlays",
+            "type": "array"
+          }
+        },
+        "required": [
+          "overlays"
+        ],
+        "title": "OverlaysRequest",
+        "type": "object"
+      },
+      "Overrides": {
+        "properties": {
+          "message": {
+            "title": "Message",
+            "type": "string"
+          },
+          "overrides": {
+            "additionalProperties": {
+              "additionalProperties": {
+                "type": "number"
+              },
+              "type": "object"
+            },
+            "title": "Overrides",
+            "type": "object"
+          }
+        },
+        "required": [
+          "overrides",
+          "message"
+        ],
+        "title": "Overrides",
+        "type": "object"
+      },
+      "Peak2d": {
+        "additionalProperties": true,
+        "properties": {
+          "chi": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Chi"
+          },
+          "col": {
+            "title": "Col",
+            "type": "number"
+          },
+          "height": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Height"
+          },
+          "peak": {
+            "title": "Peak",
+            "type": "integer"
+          },
+          "q": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Q"
+          },
+          "qr": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Qr"
+          },
+          "qz": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Qz"
+          },
+          "row": {
+            "title": "Row",
+            "type": "number"
+          }
+        },
+        "required": [
+          "peak",
+          "row",
+          "col"
+        ],
+        "title": "Peak2d",
+        "type": "object"
+      },
+      "PeakRow": {
+        "additionalProperties": true,
+        "properties": {
+          "area": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Area"
+          },
+          "area_error": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Area Error"
+          },
+          "center": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Center"
+          },
+          "center_error": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Center Error"
+          },
+          "fwhm": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Fwhm"
+          },
+          "fwhm_error": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Fwhm Error"
+          },
+          "peak": {
+            "title": "Peak",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "peak"
+        ],
+        "title": "PeakRow",
+        "type": "object"
+      },
+      "Peaks2d": {
+        "properties": {
+          "file": {
+            "title": "File",
+            "type": "string"
+          },
+          "overlays": {
+            "items": {
+              "$ref": "#/components/schemas/OverlayIn"
+            },
+            "title": "Overlays",
+            "type": "array"
+          },
+          "peaks": {
+            "items": {
+              "$ref": "#/components/schemas/Peak2d"
+            },
+            "title": "Peaks",
+            "type": "array"
+          }
+        },
+        "required": [
+          "file",
+          "peaks",
+          "overlays"
+        ],
+        "title": "Peaks2d",
+        "type": "object"
+      },
+      "Peaks2dRequest": {
+        "properties": {
+          "context": {
+            "$ref": "#/components/schemas/Context"
+          },
+          "file": {
+            "title": "File",
+            "type": "string"
+          },
+          "fit": {
+            "default": false,
+            "title": "Fit",
+            "type": "boolean"
+          },
+          "half_width": {
+            "default": 10,
+            "title": "Half Width",
+            "type": "integer"
+          },
+          "max_peaks": {
+            "default": 30,
+            "title": "Max Peaks",
+            "type": "integer"
+          },
+          "min_distance": {
+            "default": 5,
+            "title": "Min Distance",
+            "type": "integer"
+          },
+          "min_snr": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": 5.0,
+            "title": "Min Snr"
+          }
+        },
+        "required": [
+          "file"
+        ],
+        "title": "Peaks2dRequest",
+        "type": "object"
+      },
+      "PixelInfo": {
+        "properties": {
+          "alpha_f": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Alpha F"
+          },
+          "chi": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Chi"
+          },
+          "col": {
+            "title": "Col",
+            "type": "number"
+          },
+          "on_detector": {
+            "title": "On Detector",
+            "type": "boolean"
+          },
+          "q": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Q"
+          },
+          "qr": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Qr"
+          },
+          "qz": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Qz"
+          },
+          "row": {
+            "title": "Row",
+            "type": "number"
+          },
+          "two_theta_f": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Two Theta F"
+          }
+        },
+        "required": [
+          "row",
+          "col",
+          "on_detector"
+        ],
+        "title": "PixelInfo",
+        "type": "object"
+      },
+      "PoleMap": {
+        "properties": {
+          "chi": {
+            "items": {
+              "items": {
+                "type": "number"
+              },
+              "type": "array"
+            },
+            "title": "Chi",
+            "type": "array"
+          },
+          "file": {
+            "title": "File",
+            "type": "string"
+          },
+          "file_label": {
+            "title": "File Label",
+            "type": "string"
+          },
+          "x": {
+            "items": {
+              "type": "number"
+            },
+            "title": "X",
+            "type": "array"
+          },
+          "y": {
+            "items": {
+              "type": "number"
+            },
+            "title": "Y",
+            "type": "array"
+          },
+          "z": {
+            "items": {
+              "items": {
+                "anyOf": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "type": "array"
+            },
+            "title": "Z",
+            "type": "array"
+          }
+        },
+        "required": [
+          "file",
+          "file_label",
+          "x",
+          "y",
+          "z",
+          "chi"
+        ],
+        "title": "PoleMap",
+        "type": "object"
+      },
+      "PoleMapsRequest": {
+        "properties": {
+          "n": {
+            "default": 151,
+            "title": "N",
+            "type": "integer"
+          },
+          "projection": {
+            "default": "equal-area",
+            "title": "Projection",
+            "type": "string"
+          },
+          "result": {
+            "additionalProperties": true,
+            "description": "a texture result",
+            "title": "Result",
+            "type": "object"
+          }
+        },
+        "required": [
+          "result"
+        ],
+        "title": "PoleMapsRequest",
+        "type": "object"
+      },
+      "PrepareRequest": {
+        "properties": {
+          "context": {
+            "$ref": "#/components/schemas/Context"
+          },
+          "file": {
+            "title": "File",
+            "type": "string"
+          }
+        },
+        "required": [
+          "file"
+        ],
+        "title": "PrepareRequest",
+        "type": "object"
+      },
+      "PresetRequest": {
+        "properties": {
+          "existing": {
+            "items": {
+              "$ref": "#/components/schemas/Roi"
+            },
+            "title": "Existing",
+            "type": "array"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          }
+        },
+        "required": [
+          "label"
+        ],
+        "title": "PresetRequest",
+        "type": "object"
+      },
+      "ProcessingIn": {
+        "description": "How images and cuts are made (``workspace.common.Processing``).",
+        "properties": {
+          "frames": {
+            "default": "mean",
+            "description": "'mean', 'sum', a frame index or a range 'a:b[:c]'",
+            "title": "Frames",
+            "type": "string"
+          },
+          "level": {
+            "default": "I2",
+            "description": "correction level: raw, I1, I2, I3 or I4",
+            "title": "Level",
+            "type": "string"
+          },
+          "normalization": {
+            "default": "none",
+            "description": "dose normalization: none, exposure, monitor or monitor_rate",
+            "title": "Normalization",
+            "type": "string"
+          },
+          "sample": {
+            "additionalProperties": true,
+            "description": "sample and beam settings (correction-config keys)",
+            "title": "Sample",
+            "type": "object"
+          }
+        },
+        "title": "ProcessingIn",
+        "type": "object"
+      },
+      "RefineRequest": {
+        "properties": {
+          "beta": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Beta"
+          },
+          "branches": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Branches",
+            "type": "array"
+          },
+          "centering": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Centering"
+          },
+          "context": {
+            "$ref": "#/components/schemas/Context"
+          },
+          "delta": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Delta"
+          },
+          "file": {
+            "title": "File",
+            "type": "string"
+          },
+          "free": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Free",
+            "type": "array"
+          },
+          "lattice": {
+            "description": "a, b, c, alpha, beta, gamma; c None for a 2-D lattice",
+            "items": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "title": "Lattice",
+            "type": "array"
+          },
+          "peaks": {
+            "description": "measured peaks with qr and qz",
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "title": "Peaks",
+            "type": "array"
+          },
+          "plane": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "integer"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Plane"
+          },
+          "q_max": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Q Max"
+          },
+          "space_group": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Space Group"
+          },
+          "system": {
+            "default": "auto",
+            "title": "System",
+            "type": "string"
+          },
+          "uvw": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "number"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Uvw"
+          }
+        },
+        "required": [
+          "file",
+          "lattice",
+          "peaks"
+        ],
+        "title": "RefineRequest",
+        "type": "object"
+      },
+      "Refined": {
+        "additionalProperties": true,
+        "properties": {
+          "errors": {
+            "title": "Errors"
+          },
+          "index": {
+            "$ref": "#/components/schemas/Indexed"
+          },
+          "lattice": {
+            "additionalProperties": true,
+            "title": "Lattice",
+            "type": "object"
+          },
+          "rms": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rms"
+          },
+          "summary": {
+            "title": "Summary",
+            "type": "string"
+          }
+        },
+        "required": [
+          "lattice",
+          "summary",
+          "index"
+        ],
+        "title": "Refined",
+        "type": "object"
+      },
+      "Reflectivity": {
+        "additionalProperties": true,
+        "properties": {
+          "R": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "title": "R",
+            "type": "array"
+          },
+          "absolute": {
+            "title": "Absolute",
+            "type": "boolean"
+          },
+          "alpha_i": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "title": "Alpha I",
+            "type": "array"
+          },
+          "level": {
+            "title": "Level",
+            "type": "string"
+          },
+          "overlays": {
+            "items": {
+              "$ref": "#/components/schemas/OverlayIn"
+            },
+            "title": "Overlays",
+            "type": "array"
+          },
+          "qz": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "title": "Qz",
+            "type": "array"
+          },
+          "segment": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "integer"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Segment"
+          },
+          "sigma": {
+            "anyOf": [
+              {
+                "items": {
+                  "anyOf": [
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sigma"
+          },
+          "summary": {
+            "title": "Summary",
+            "type": "string"
+          },
+          "table": {
+            "title": "Table",
+            "type": "string"
+          }
+        },
+        "required": [
+          "qz",
+          "R",
+          "alpha_i",
+          "absolute",
+          "level",
+          "summary",
+          "table",
+          "overlays"
+        ],
+        "title": "Reflectivity",
+        "type": "object"
+      },
+      "ReflectivityRequest": {
+        "properties": {
+          "angle_offset_deg": {
+            "default": 0.0,
+            "title": "Angle Offset Deg",
+            "type": "number"
+          },
+          "background_offset_px": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Background Offset Px"
+          },
+          "context": {
+            "$ref": "#/components/schemas/Context"
+          },
+          "direct_beam": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Direct Beam"
+          },
+          "files": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Files",
+            "type": "array"
+          },
+          "half_width_px": {
+            "items": {
+              "type": "number"
+            },
+            "title": "Half Width Px",
+            "type": "array"
+          },
+          "level": {
+            "default": "raw",
+            "title": "Level",
+            "type": "string"
+          },
+          "match": {
+            "default": false,
+            "title": "Match",
+            "type": "boolean"
+          },
+          "min_coverage": {
+            "default": 1.0,
+            "title": "Min Coverage",
+            "type": "number"
+          }
+        },
+        "required": [
+          "files"
+        ],
+        "title": "ReflectivityRequest",
+        "type": "object"
+      },
+      "RingsRequest": {
+        "properties": {
+          "calibrant": {
+            "default": "AgBeh",
+            "title": "Calibrant",
+            "type": "string"
+          },
+          "context": {
+            "$ref": "#/components/schemas/Context"
+          },
+          "file": {
+            "title": "File",
+            "type": "string"
+          },
+          "fit_tilt": {
+            "default": true,
+            "title": "Fit Tilt",
+            "type": "boolean"
+          },
+          "n_rings": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "N Rings"
+          }
+        },
+        "required": [
+          "file"
+        ],
+        "title": "RingsRequest",
+        "type": "object"
+      },
+      "Roi": {
+        "additionalProperties": true,
+        "description": "A box ROI (``workspace.rois``): ranges in display units, None for an open end.",
+        "properties": {
+          "above_horizon": {
+            "default": true,
+            "title": "Above Horizon",
+            "type": "boolean"
+          },
+          "along": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Along"
+          },
+          "bins": {
+            "default": 300,
+            "title": "Bins",
+            "type": "integer"
+          },
+          "enabled": {
+            "default": true,
+            "title": "Enabled",
+            "type": "boolean"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "mirror": {
+            "default": false,
+            "title": "Mirror",
+            "type": "boolean"
+          },
+          "name": {
+            "default": "",
+            "title": "Name",
+            "type": "string"
+          },
+          "x0": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "X0"
+          },
+          "x1": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "X1"
+          },
+          "x_map": {
+            "title": "X Map",
+            "type": "string"
+          },
+          "y0": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Y0"
+          },
+          "y1": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Y1"
+          },
+          "y_map": {
+            "title": "Y Map",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "x_map",
+          "y_map"
+        ],
+        "title": "Roi",
+        "type": "object"
+      },
+      "RoiJsonRequest": {
+        "properties": {
+          "frames": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Frames"
+          },
+          "level": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Level"
+          },
+          "rois": {
+            "items": {
+              "$ref": "#/components/schemas/Roi"
+            },
+            "title": "Rois",
+            "type": "array"
+          }
+        },
+        "required": [
+          "rois"
+        ],
+        "title": "RoiJsonRequest",
+        "type": "object"
+      },
+      "RoiRequest": {
+        "description": "A box drawn on a view: its ROI (cut along its relatively longer side).",
+        "properties": {
+          "existing": {
+            "items": {
+              "$ref": "#/components/schemas/Roi"
+            },
+            "title": "Existing",
+            "type": "array"
+          },
+          "view": {
+            "title": "View",
+            "type": "string"
+          },
+          "x0": {
+            "title": "X0",
+            "type": "number"
+          },
+          "x1": {
+            "title": "X1",
+            "type": "number"
+          },
+          "x_span": {
+            "title": "X Span",
+            "type": "number"
+          },
+          "y0": {
+            "title": "Y0",
+            "type": "number"
+          },
+          "y1": {
+            "title": "Y1",
+            "type": "number"
+          },
+          "y_span": {
+            "title": "Y Span",
+            "type": "number"
+          }
+        },
+        "required": [
+          "view",
+          "x0",
+          "x1",
+          "y0",
+          "y1",
+          "x_span",
+          "y_span"
+        ],
+        "title": "RoiRequest",
+        "type": "object"
+      },
+      "Sample": {
+        "properties": {
+          "sample": {
+            "additionalProperties": true,
+            "title": "Sample",
+            "type": "object"
+          },
+          "text": {
+            "title": "Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "sample",
+          "text"
+        ],
+        "title": "Sample",
+        "type": "object"
+      },
+      "SampleRequest": {
+        "properties": {
+          "values": {
+            "description": "the sample fields in Info.sample_fields order, display units",
+            "items": {},
+            "title": "Values",
+            "type": "array"
+          }
+        },
+        "required": [
+          "values"
+        ],
+        "title": "SampleRequest",
+        "type": "object"
+      },
+      "SeriesRequest": {
+        "properties": {
+          "context": {
+            "$ref": "#/components/schemas/Context"
+          },
+          "file": {
+            "title": "File",
+            "type": "string"
+          },
+          "frames": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Frames"
+          },
+          "roi": {
+            "$ref": "#/components/schemas/Roi"
+          },
+          "track": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "{\"window\": [lo, hi], \"peaks\": n | positions, \"shape\"}",
+            "title": "Track"
+          }
+        },
+        "required": [
+          "file",
+          "roi"
+        ],
+        "title": "SeriesRequest",
+        "type": "object"
+      },
+      "SeriesTableRequest": {
+        "properties": {
+          "result": {
+            "additionalProperties": true,
+            "title": "Result",
+            "type": "object"
+          }
+        },
+        "required": [
+          "result"
+        ],
+        "title": "SeriesTableRequest",
+        "type": "object"
+      },
+      "SessionSetup": {
+        "properties": {
+          "description": {
+            "title": "Description",
+            "type": "string"
+          },
+          "own": {
+            "description": "set in this session (else the app-wide --workflow, or none)",
+            "title": "Own",
+            "type": "boolean"
+          },
+          "setup": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SetupInfo"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "setup",
+          "description",
+          "own"
+        ],
+        "title": "SessionSetup",
+        "type": "object"
+      },
+      "SetupInfo": {
+        "additionalProperties": true,
+        "description": "The setup file in use (``Workspace.workflow_info``).",
+        "properties": {
+          "description": {
+            "title": "Description",
+            "type": "string"
+          },
+          "files": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "title": "Files",
+            "type": "object"
+          },
+          "frame": {
+            "title": "Frame",
+            "type": "integer"
+          },
+          "frame_exact": {
+            "title": "Frame Exact",
+            "type": "boolean"
+          },
+          "frames": {
+            "title": "Frames",
+            "type": "string"
+          },
+          "hash": {
+            "title": "Hash",
+            "type": "string"
+          },
+          "level": {
+            "title": "Level",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "normalization": {
+            "title": "Normalization",
+            "type": "string"
+          },
+          "other_sample": {
+            "additionalProperties": true,
+            "title": "Other Sample",
+            "type": "object"
+          },
+          "path": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Path"
+          },
+          "sample": {
+            "additionalProperties": true,
+            "title": "Sample",
+            "type": "object"
+          },
+          "source": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source"
+          },
+          "version": {
+            "title": "Version"
+          }
+        },
+        "required": [
+          "name",
+          "version",
+          "hash",
+          "level",
+          "frames",
+          "frame",
+          "frame_exact",
+          "normalization",
+          "sample",
+          "other_sample",
+          "files",
+          "description"
+        ],
+        "title": "SetupInfo",
+        "type": "object"
+      },
+      "SetupRequest": {
+        "properties": {
+          "path": {
+            "description": "a workflow file in the data folder",
+            "title": "Path",
+            "type": "string"
+          }
+        },
+        "required": [
+          "path"
+        ],
+        "title": "SetupRequest",
+        "type": "object"
+      },
+      "SpecularCheckRequest": {
+        "properties": {
+          "band_px": {
+            "default": 10.0,
+            "title": "Band Px",
+            "type": "number"
+          },
+          "context": {
+            "$ref": "#/components/schemas/Context"
+          },
+          "file": {
+            "title": "File",
+            "type": "string"
+          },
+          "half_width": {
+            "default": 7,
+            "title": "Half Width",
+            "type": "integer"
+          },
+          "min_snr": {
+            "default": 10.0,
+            "title": "Min Snr",
+            "type": "number"
+          },
+          "search": {
+            "default": 0.3,
+            "title": "Search",
+            "type": "number"
+          }
+        },
+        "required": [
+          "file"
+        ],
+        "title": "SpecularCheckRequest",
+        "type": "object"
+      },
+      "SpecularRequest": {
+        "properties": {
+          "band_px": {
+            "default": 10.0,
+            "title": "Band Px",
+            "type": "number"
+          },
+          "context": {
+            "$ref": "#/components/schemas/Context"
+          },
+          "files": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Files",
+            "type": "array"
+          },
+          "fit_distance": {
+            "default": true,
+            "title": "Fit Distance",
+            "type": "boolean"
+          },
+          "fit_offset": {
+            "default": true,
+            "title": "Fit Offset",
+            "type": "boolean"
+          },
+          "half_width": {
+            "default": 7,
+            "title": "Half Width",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "files"
+        ],
+        "title": "SpecularRequest",
+        "type": "object"
+      },
+      "StatusItem": {
+        "properties": {
+          "key": {
+            "title": "Key",
+            "type": "string"
+          },
+          "state": {
+            "title": "State",
+            "type": "string"
+          },
+          "text": {
+            "title": "Text",
+            "type": "string"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "key",
+          "text",
+          "state",
+          "title"
+        ],
+        "title": "StatusItem",
+        "type": "object"
+      },
+      "Summary": {
+        "description": "The file shown: its metadata rows, frames, geometry and what its processing has had.",
+        "properties": {
+          "frames": {
+            "title": "Frames",
+            "type": "integer"
+          },
+          "geometry": {
+            "additionalProperties": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "description": "the editable geometry as the dataset uses it",
+            "title": "Geometry",
+            "type": "object"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "original_geometry": {
+            "additionalProperties": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "description": "before the page's overrides",
+            "title": "Original Geometry",
+            "type": "object"
+          },
+          "rows": {
+            "items": {
+              "$ref": "#/components/schemas/SummaryRow"
+            },
+            "title": "Rows",
+            "type": "array"
+          },
+          "status": {
+            "items": {
+              "$ref": "#/components/schemas/StatusItem"
+            },
+            "title": "Status",
+            "type": "array"
+          }
+        },
+        "required": [
+          "id",
+          "label",
+          "rows",
+          "frames",
+          "geometry",
+          "original_geometry",
+          "status"
+        ],
+        "title": "Summary",
+        "type": "object"
+      },
+      "SummaryRow": {
+        "properties": {
+          "changed": {
+            "description": "set by the setup file or in Setup",
+            "title": "Changed",
+            "type": "boolean"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "value": {
+            "title": "Value",
+            "type": "string"
+          }
+        },
+        "required": [
+          "label",
+          "value",
+          "changed"
+        ],
+        "title": "SummaryRow",
+        "type": "object"
+      },
+      "Texture": {
+        "additionalProperties": true,
+        "properties": {
+          "background": {
+            "title": "Background",
+            "type": "boolean"
+          },
+          "crystallinity": {
+            "additionalProperties": true,
+            "title": "Crystallinity",
+            "type": "object"
+          },
+          "errors": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "title": "Errors",
+            "type": "array"
+          },
+          "files": {
+            "items": {
+              "$ref": "#/components/schemas/TextureFile"
+            },
+            "title": "Files",
+            "type": "array"
+          },
+          "folded": {
+            "title": "Folded",
+            "type": "boolean"
+          },
+          "frames": {
+            "title": "Frames",
+            "type": "string"
+          },
+          "half_width": {
+            "title": "Half Width",
+            "type": "number"
+          },
+          "level": {
+            "title": "Level",
+            "type": "string"
+          },
+          "overlays": {
+            "items": {
+              "$ref": "#/components/schemas/OverlayIn"
+            },
+            "title": "Overlays",
+            "type": "array"
+          },
+          "q0": {
+            "title": "Q0",
+            "type": "number"
+          },
+          "refraction": {
+            "title": "Refraction",
+            "type": "boolean"
+          },
+          "split": {
+            "title": "Split",
+            "type": "number"
+          }
+        },
+        "required": [
+          "q0",
+          "half_width",
+          "folded",
+          "background",
+          "split",
+          "refraction",
+          "level",
+          "frames",
+          "files",
+          "errors",
+          "overlays",
+          "crystallinity"
+        ],
+        "title": "Texture",
+        "type": "object"
+      },
+      "TextureFile": {
+        "additionalProperties": true,
+        "properties": {
+          "accessible": {
+            "items": {
+              "type": "boolean"
+            },
+            "title": "Accessible",
+            "type": "array"
+          },
+          "chi": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "title": "Chi",
+            "type": "array"
+          },
+          "file": {
+            "title": "File",
+            "type": "string"
+          },
+          "file_label": {
+            "title": "File Label",
+            "type": "string"
+          },
+          "intensity": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "title": "Intensity",
+            "type": "array"
+          },
+          "orientation": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Orientation"
+          },
+          "orientation_error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Orientation Error"
+          },
+          "sigma": {
+            "anyOf": [
+              {
+                "items": {
+                  "anyOf": [
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sigma"
+          }
+        },
+        "required": [
+          "file",
+          "file_label",
+          "chi",
+          "intensity",
+          "accessible"
+        ],
+        "title": "TextureFile",
+        "type": "object"
+      },
+      "TextureRequest": {
+        "properties": {
+          "background": {
+            "default": true,
+            "title": "Background",
+            "type": "boolean"
+          },
+          "context": {
+            "$ref": "#/components/schemas/Context"
+          },
+          "files": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Files",
+            "type": "array"
+          },
+          "fold": {
+            "default": true,
+            "title": "Fold",
+            "type": "boolean"
+          },
+          "half_width": {
+            "default": 0.01,
+            "title": "Half Width",
+            "type": "number"
+          },
+          "q0": {
+            "title": "Q0",
+            "type": "number"
+          },
+          "reference": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reference"
+          },
+          "refraction": {
+            "default": false,
+            "title": "Refraction",
+            "type": "boolean"
+          },
+          "split": {
+            "default": 45.0,
+            "title": "Split",
+            "type": "number"
+          },
+          "thickness": {
+            "additionalProperties": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "title": "Thickness",
+            "type": "object"
+          }
+        },
+        "required": [
+          "files",
+          "q0"
+        ],
+        "title": "TextureRequest",
+        "type": "object"
+      },
+      "TextureTextRequest": {
+        "properties": {
+          "reference": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reference"
+          },
+          "result": {
+            "additionalProperties": true,
+            "title": "Result",
+            "type": "object"
+          },
+          "rows": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "title": "Rows",
+            "type": "array"
+          }
+        },
+        "required": [
+          "result"
+        ],
+        "title": "TextureTextRequest",
+        "type": "object"
+      },
+      "ValidationError": {
+        "properties": {
+          "ctx": {
+            "title": "Context",
+            "type": "object"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "title": "Location",
+            "type": "array"
+          },
+          "msg": {
+            "title": "Message",
+            "type": "string"
+          },
+          "type": {
+            "title": "Error Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError",
+        "type": "object"
+      },
+      "ViewInfo": {
+        "properties": {
+          "equal_aspect": {
+            "title": "Equal Aspect",
+            "type": "boolean"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "x_label": {
+            "title": "X Label",
+            "type": "string"
+          },
+          "x_map": {
+            "title": "X Map",
+            "type": "string"
+          },
+          "y_label": {
+            "title": "Y Label",
+            "type": "string"
+          },
+          "y_map": {
+            "title": "Y Map",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "label",
+          "x_map",
+          "y_map",
+          "x_label",
+          "y_label",
+          "equal_aspect"
+        ],
+        "title": "ViewInfo",
+        "type": "object"
+      }
+    }
+  },
+  "info": {
+    "title": "gixsu web",
+    "version": "0.1.0"
+  },
+  "openapi": "3.1.0",
+  "paths": {
+    "/api/calibrate/beam-center": {
+      "post": {
+        "operationId": "beam_center_api_calibrate_beam_center_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BeamCenterRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Calibration"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "The direct-beam center from its spot"
+      }
+    },
+    "/api/calibrate/check": {
+      "post": {
+        "operationId": "specular_check_api_calibrate_check_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SpecularCheckRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Calibration"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "The incident angle the file's specular spot implies"
+      }
+    },
+    "/api/cuts": {
+      "post": {
+        "operationId": "cuts_api_cuts_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CutsRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Cuts"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "The cuts of the ROIs on the files"
+      }
+    },
+    "/api/cuts/export": {
+      "post": {
+        "operationId": "cuts_export_api_cuts_export_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CutsRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/zip": {}
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "The cuts as text files in a zip archive"
+      }
+    },
+    "/api/exports/metadata-json": {
+      "post": {
+        "operationId": "export_metadata_api_exports_metadata_json_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MetadataJsonRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Geometry overrides as a --metadata-json file"
+      }
+    },
+    "/api/exports/roi-json": {
+      "post": {
+        "operationId": "export_rois_api_exports_roi_json_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RoiJsonRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "The ROIs as a gixsu linecut --roi-json file"
+      }
+    },
+    "/api/exports/series-table": {
+      "post": {
+        "operationId": "export_series_api_exports_series_table_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SeriesTableRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "A frame series as a tab-separated table"
+      }
+    },
+    "/api/exports/texture-text": {
+      "post": {
+        "operationId": "export_texture_api_exports_texture_text_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TextureTextRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "A texture result as a tab-separated table"
+      }
+    },
+    "/api/files": {
+      "get": {
+        "operationId": "files_api_files_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "pattern",
+            "required": false,
+            "schema": {
+              "default": "",
+              "title": "Pattern",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 2000,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "rescan",
+            "required": false,
+            "schema": {
+              "default": false,
+              "title": "Rescan",
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FileList"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "The dataset files, newest first"
+      }
+    },
+    "/api/files/{name}/image": {
+      "get": {
+        "operationId": "image_api_files__name__image_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "title": "Name",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "view",
+            "required": false,
+            "schema": {
+              "default": "detector",
+              "title": "View",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "level",
+            "required": false,
+            "schema": {
+              "default": "I2",
+              "title": "Level",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "frames",
+            "required": false,
+            "schema": {
+              "default": "mean",
+              "title": "Frames",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "normalization",
+            "required": false,
+            "schema": {
+              "default": "none",
+              "title": "Normalization",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "sample",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Sample"
+            }
+          },
+          {
+            "in": "query",
+            "name": "overrides",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Overrides"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "format": "binary",
+                  "type": "string"
+                }
+              }
+            },
+            "description": "the image in the view as float32 rows (NaN where no valid pixel contributes), at most max_image_px on its longer side",
+            "headers": {
+              "X-Array-Dtype": {
+                "description": "the element type: f4, f8, i1, u1, i2, u2, i4, u4, i8 or u8, little-endian",
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-Array-Meta": {
+                "description": "JSON describing the array, the shape of ImageMeta",
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-Array-Shape": {
+                "description": "the array's shape, comma-separated",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Image"
+      }
+    },
+    "/api/files/{name}/image/meta": {
+      "get": {
+        "operationId": "image_meta_route_api_files__name__image_meta_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "title": "Name",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "view",
+            "required": false,
+            "schema": {
+              "default": "detector",
+              "title": "View",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "level",
+            "required": false,
+            "schema": {
+              "default": "I2",
+              "title": "Level",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "frames",
+            "required": false,
+            "schema": {
+              "default": "mean",
+              "title": "Frames",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "normalization",
+            "required": false,
+            "schema": {
+              "default": "none",
+              "title": "Normalization",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "sample",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Sample"
+            }
+          },
+          {
+            "in": "query",
+            "name": "overrides",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Overrides"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImageMeta"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "What the image route sends, without the array"
+      }
+    },
+    "/api/files/{name}/overlays": {
+      "post": {
+        "operationId": "overlays_api_files__name__overlays_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "title": "Name",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "view",
+            "required": false,
+            "schema": {
+              "default": "detector",
+              "title": "View",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OverlaysRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/OverlayTrace"
+                  },
+                  "title": "Response Overlays Api Files  Name  Overlays Post",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "The tools' overlays in the coordinates of a view"
+      }
+    },
+    "/api/files/{name}/pixel": {
+      "get": {
+        "operationId": "pixel_api_files__name__pixel_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "title": "Name",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "x",
+            "required": true,
+            "schema": {
+              "title": "X",
+              "type": "number"
+            }
+          },
+          {
+            "in": "query",
+            "name": "y",
+            "required": true,
+            "schema": {
+              "title": "Y",
+              "type": "number"
+            }
+          },
+          {
+            "in": "query",
+            "name": "view",
+            "required": false,
+            "schema": {
+              "default": "detector",
+              "title": "View",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "level",
+            "required": false,
+            "schema": {
+              "default": "I2",
+              "title": "Level",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "frames",
+            "required": false,
+            "schema": {
+              "default": "mean",
+              "title": "Frames",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "normalization",
+            "required": false,
+            "schema": {
+              "default": "none",
+              "title": "Normalization",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "sample",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Sample"
+            }
+          },
+          {
+            "in": "query",
+            "name": "overrides",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Overrides"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PixelInfo"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "q and angles at a point of a view"
+      }
+    },
+    "/api/files/{name}/summary": {
+      "get": {
+        "operationId": "summary_api_files__name__summary_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "title": "Name",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "level",
+            "required": false,
+            "schema": {
+              "default": "I2",
+              "title": "Level",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "frames",
+            "required": false,
+            "schema": {
+              "default": "mean",
+              "title": "Frames",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "normalization",
+            "required": false,
+            "schema": {
+              "default": "none",
+              "title": "Normalization",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "sample",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Sample"
+            }
+          },
+          {
+            "in": "query",
+            "name": "overrides",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Overrides"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Summary"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "The file's metadata, frames, geometry and processing status"
+      }
+    },
+    "/api/fit-cut": {
+      "post": {
+        "operationId": "fit_cut_api_fit_cut_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FitCutRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FitCut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Fit peaks on a cut"
+      }
+    },
+    "/api/frame-series": {
+      "post": {
+        "operationId": "frame_series_api_frame_series_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SeriesRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FrameSeries"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "A cut in every frame of a stack, now"
+      }
+    },
+    "/api/health": {
+      "get": {
+        "operationId": "health_api_health_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Health"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Liveness and versions",
+        "tags": [
+          "service"
+        ]
+      }
+    },
+    "/api/incidence": {
+      "post": {
+        "operationId": "incidence_api_incidence_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/IncidenceRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Incidence"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "An incidence-angle series, now"
+      }
+    },
+    "/api/index": {
+      "post": {
+        "operationId": "index_lattice_api_index_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LatticeRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Indexed"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Predicted positions of a lattice's reflections"
+      }
+    },
+    "/api/info": {
+      "get": {
+        "operationId": "info_api_info_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Info"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "The folder, the choices of every control, the setup in use"
+      }
+    },
+    "/api/jobs/calibrate/rings": {
+      "post": {
+        "operationId": "rings_job_api_jobs_calibrate_rings_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RingsRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JobState"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Geometry from calibrant rings, as a job"
+      }
+    },
+    "/api/jobs/calibrate/specular": {
+      "post": {
+        "operationId": "specular_job_api_jobs_calibrate_specular_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SpecularRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JobState"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Distance and αi offset from specular spots, as a job"
+      }
+    },
+    "/api/jobs/frame-series": {
+      "post": {
+        "operationId": "frame_series_job_api_jobs_frame_series_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SeriesRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JobState"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "A cut in every frame of a stack, as a job (its result is a FrameSeries)"
+      }
+    },
+    "/api/jobs/incidence": {
+      "post": {
+        "operationId": "incidence_job_api_jobs_incidence_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/IncidenceRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JobState"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "An incidence-angle series, as a job (its result is an Incidence)"
+      }
+    },
+    "/api/jobs/prepare": {
+      "post": {
+        "operationId": "prepare_api_jobs_prepare_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PrepareRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JobState"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Open a file (build its solver) as a job"
+      }
+    },
+    "/api/jobs/reflectivity": {
+      "post": {
+        "operationId": "reflectivity_job_api_jobs_reflectivity_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReflectivityRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JobState"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Specular reflectivity from the images, as a job (its result is a Reflectivity)"
+      }
+    },
+    "/api/jobs/texture": {
+      "post": {
+        "operationId": "texture_job_api_jobs_texture_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TextureRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JobState"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "I(χ), orientation and pole figures as a job (its result is a Texture)"
+      }
+    },
+    "/api/jobs/{job_id}": {
+      "delete": {
+        "operationId": "job_cancel_api_jobs__job_id__delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "job_id",
+            "required": true,
+            "schema": {
+              "title": "Job Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JobState"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Cancel the job",
+        "tags": [
+          "jobs"
+        ]
+      },
+      "get": {
+        "operationId": "job_state_api_jobs__job_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "job_id",
+            "required": true,
+            "schema": {
+              "title": "Job Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JobState"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "The job's state",
+        "tags": [
+          "jobs"
+        ]
+      }
+    },
+    "/api/jobs/{job_id}/events": {
+      "get": {
+        "operationId": "job_events_api_jobs__job_id__events_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "job_id",
+            "required": true,
+            "schema": {
+              "title": "Job Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "text/event-stream": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "description": "event: <status>, data: the JobState as JSON; one per change"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "The job's states as Server-Sent Events, until it finishes",
+        "tags": [
+          "jobs"
+        ]
+      }
+    },
+    "/api/peaks-2d": {
+      "post": {
+        "operationId": "peaks_2d_api_peaks_2d_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Peaks2dRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Peaks2d"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Peaks of the image with their q"
+      }
+    },
+    "/api/refine": {
+      "post": {
+        "operationId": "refine_lattice_api_refine_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RefineRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Refined"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Refine the lattice to measured peaks, then index"
+      }
+    },
+    "/api/reflectivity": {
+      "post": {
+        "operationId": "reflectivity_api_reflectivity_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReflectivityRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Reflectivity"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Specular reflectivity from the images, now"
+      }
+    },
+    "/api/rois/from-box": {
+      "post": {
+        "operationId": "roi_from_box_api_rois_from_box_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RoiRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Roi"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "The ROI of a box drawn on a view"
+      }
+    },
+    "/api/rois/normalize": {
+      "post": {
+        "operationId": "roi_normalize_api_rois_normalize_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Roi"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Roi"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "An ROI with its edited fields coerced"
+      }
+    },
+    "/api/rois/preset": {
+      "post": {
+        "operationId": "roi_preset_api_rois_preset_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PresetRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Roi"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "A standard cut as an ROI"
+      }
+    },
+    "/api/session/setup": {
+      "delete": {
+        "operationId": "clear_setup_api_session_setup_delete",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SessionSetup"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "This session: the files' own geometry and default processing"
+      },
+      "get": {
+        "operationId": "get_setup_api_session_setup_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SessionSetup"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "The setup file this session uses"
+      },
+      "post": {
+        "operationId": "load_setup_api_session_setup_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SetupRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SessionSetup"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Load a workflow file's setup for this session"
+      }
+    },
+    "/api/setup/geometry": {
+      "post": {
+        "operationId": "setup_geometry_api_setup_geometry_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GeometryRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Overrides"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Apply edited geometry to files: the overrides after it"
+      }
+    },
+    "/api/setup/sample": {
+      "post": {
+        "operationId": "setup_sample_api_setup_sample_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SampleRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Sample"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "The sample settings of the typed fields"
+      }
+    },
+    "/api/texture": {
+      "post": {
+        "operationId": "texture_api_texture_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TextureRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Texture"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "I(χ), orientation and pole figures, now"
+      }
+    },
+    "/api/texture/crystallinity": {
+      "post": {
+        "operationId": "texture_crystallinity_api_texture_crystallinity_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CrystallinityRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Crystallinity"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "The relative degree of crystallinity of the rows"
+      }
+    },
+    "/api/texture/pole-maps": {
+      "post": {
+        "operationId": "texture_pole_maps_api_texture_pole_maps_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PoleMapsRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/PoleMap"
+                  },
+                  "title": "Response Texture Pole Maps Api Texture Pole Maps Post",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "The pole figures of a texture result as 2-D maps"
+      }
+    }
+  }
+}

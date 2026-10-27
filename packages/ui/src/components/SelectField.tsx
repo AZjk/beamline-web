@@ -8,6 +8,8 @@ import { cn } from "../cn";
 export interface SelectOption<V extends string> {
   value: V;
   label: string;
+  /** Shown on hover over the option (where the browser supports it). */
+  title?: string;
 }
 
 export interface SelectFieldProps<V extends string> extends Omit<
@@ -41,7 +43,7 @@ export function SelectField<V extends string>({
       {...rest}
     >
       {options.map((option) => (
-        <option key={option.value} value={option.value}>
+        <option key={option.value} value={option.value} title={option.title}>
           {option.label}
         </option>
       ))}

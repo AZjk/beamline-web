@@ -47,6 +47,8 @@ export interface FileBrowserProps {
   /** The badges of a row (its analysis types); a default renders each type's first letters. */
   badges?: (row: FileRow) => ReactNode;
   emptyText?: string;
+  /** The app's own controls under the filter row (a follow-the-newest toggle, a count). */
+  extras?: ReactNode;
 }
 
 const SORTS: { value: FileSort; label: string }[] = [
@@ -109,6 +111,7 @@ export function FileBrowser({
   onRescan,
   badges = defaultBadges,
   emptyText = "No result files in this folder.",
+  extras,
 }: FileBrowserProps) {
   const [text, setText] = useState(filter);
   const anchor = useRef<string | null>(null);
@@ -231,6 +234,11 @@ export function FileBrowser({
           <RefreshCw size={13} />
         </Button>
       </div>
+      {extras ? (
+        <div className="flex shrink-0 flex-wrap items-center gap-x-3 gap-y-1 px-1.5 pb-1 text-xs">
+          {extras}
+        </div>
+      ) : null}
       <div
         ref={tableRef}
         tabIndex={0}

@@ -31,7 +31,7 @@ beamline-web/                    one repo, pnpm workspaces
   packages/ui/                   tokens, shell, panes, file browser, metadata tree, forms, plugin registry
   packages/viz/                  detector image, readout, overlays, ROI and mask editor, plot wrapper, colormaps
   packages/client/               generated-type tooling, binary fetch, query hooks, job client, error model
-  apps/xpcs/  apps/gixs/  apps/mask/   one Vite app per tool: tabs and panels only
+  apps/xpcs/  apps/gixs/  apps/mask/   one Vite app per tool: tabs and panels only (xpcs and gixs exist)
 
 pyXpcsViewer/  gixsu/  pySimpleMask/    tool repos stay Python libraries
   src/<tool>/core/               unchanged
@@ -120,3 +120,15 @@ The tool repositories' CI workflows carry that line as `WEBKIT_SPEC`.
 - [x] The shared Python package installs from a git tag and serves a health route behind a prefix.
 - [x] pytest runs in CI for pyXpcsViewer, gixsu and pySimpleMask.
 - [x] `pip install` of any tool without the `gui` extra pulls no Qt.
+
+## The gixs app
+
+`apps/gixs` is gixsu's page (Phase 2): the files with a follow-the-newest mode, the image in the
+detector, q_r–q_z and χ–q views with the alignment marks and the tools' overlays, box ROIs drawn
+and edited on it, and the nine tools as plugins: Cuts, Peaks, Series, Index, Texture, XRR and the
+incidence-angle series as analysis tabs, Calibrate and Setup as side tabs. Long computations run
+as jobs with their progress in the message bar. The service is `gixsu web` (branch `mc_refact`
+of gixsu); `pnpm dev` proxies `/api` to its default port 8060, and
+`GIXS_URL=http://host:8060 pnpm --filter @beamline-web/app-gixs exec playwright test e2e/real-data.spec.ts`
+runs the flow over a running service, as CI does on `gixsu synthetic` data. A release is the tag
+`gixs-v<version>`, whose bundle gixsu's own release downloads into its wheel.

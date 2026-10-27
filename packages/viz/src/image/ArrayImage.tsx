@@ -63,6 +63,9 @@ export interface ArrayImageProps {
   children?: ReactNode;
   /** SVG drawn in data coordinates over the image. */
   svg?: ReactNode;
+  /** Draw x decreasing to the right, y decreasing upwards (a detector with row 0 at the top). */
+  flipX?: boolean;
+  flipY?: boolean;
   /** H5Web's default interactions, each configurable or off (`pan: false` while a tool draws). */
   interactions?: ComponentProps<typeof DefaultInteractions>;
   onHover?: (x: number, y: number) => void;
@@ -108,6 +111,8 @@ export function ArrayImage({
   colorBarLabel,
   children,
   svg,
+  flipX = false,
+  flipY = false,
   interactions,
   onHover,
   onLeave,
@@ -116,12 +121,24 @@ export function ArrayImage({
 }: ArrayImageProps) {
   const values = useMemo(() => toNdArray(data, rows, cols), [data, rows, cols]);
   const abscissa: AxisConfig = useMemo(
-    () => ({ visDomain: [extent.xmin, extent.xmax], label: xLabel, showGrid: false, nice: false }),
-    [extent.xmin, extent.xmax, xLabel],
+    () => ({
+      visDomain: [extent.xmin, extent.xmax],
+      label: xLabel,
+      showGrid: false,
+      nice: false,
+      flip: flipX,
+    }),
+    [extent.xmin, extent.xmax, xLabel, flipX],
   );
   const ordinate: AxisConfig = useMemo(
-    () => ({ visDomain: [extent.ymin, extent.ymax], label: yLabel, showGrid: false, nice: false }),
-    [extent.ymin, extent.ymax, yLabel],
+    () => ({
+      visDomain: [extent.ymin, extent.ymax],
+      label: yLabel,
+      showGrid: false,
+      nice: false,
+      flip: flipY,
+    }),
+    [extent.ymin, extent.ymax, yLabel, flipY],
   );
   const safeDomain: Domain = domain && domain[0] < domain[1] ? domain : [0, 1];
   return (

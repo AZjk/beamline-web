@@ -55,7 +55,8 @@ showing `done / total` in the message bar; the result lands in the page's sessio
 1. The tool repository gains a Workspace, a FastAPI router built on `beamline_webkit.create_app`,
    a `[gui]` extra for its Qt and a `[web]` extra on `beamline-webkit`, the export command and
    the committed document, and CI running pytest with and without Qt.
-2. Here: `apps/<tool>` on the template of `apps/xpcs`, a `<tool>-v*` tag pattern in
+2. Here: `apps/<tool>` on the template of `apps/xpcs` (or `apps/gixs`, which has tools with
+   result-over-controls tabs, jobs with progress, an editable table and box ROIs on the image), a `<tool>-v*` tag pattern in
    `release-app.yml`, and a job in `ci.yml` that runs its Playwright flow over the service on
    synthetic data.
 

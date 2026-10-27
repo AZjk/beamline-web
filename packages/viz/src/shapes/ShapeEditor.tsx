@@ -8,9 +8,11 @@
  * at any zoom. Rendered inside the canvas (a child of ArrayImage).
  *
  * Polygon: click the vertices; close on the first one, with Enter or a double-click; Escape
- * drops it. Ellipse: drag from the center. Select: click a shape, drag its handles or its body;
- * Delete removes it, Escape deselects. The pan interaction must be off while a tool is active
- * or a shape is selected: `editorInteractions` (interactions.ts) gives ArrayImage that configuration.
+ * drops it. Ellipse: drag from the center. Rect: drag from a corner. Select: click a shape, drag
+ * its handles or its body; Delete removes it, Escape deselects. The pan interaction must be off
+ * while a tool is active or a shape is selected: `editorInteractions` (interactions.ts) gives
+ * ArrayImage that configuration. `styles` is the app's say per shape: a color, a label, dotted
+ * when disabled, a twin reflected in x.
  */
 
 import { DataToHtml, SvgElement, useCanvasEvent, useVisCanvasContext } from "@h5web/lib";
@@ -18,14 +20,22 @@ import { useThree } from "@react-three/fiber";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Vector3 } from "three";
 
-import { handlesOf, pointInShape, translated, withHandleAt } from "./geometry";
-import type { Point, Shape, ShapeTool } from "./types";
+import {
+  handlesOf,
+  mirroredX,
+  normalizedRect,
+  pointInShape,
+  shapeBounds,
+  translated,
+  withHandleAt,
+} from "./geometry";
+import type { Point, Shape, ShapeStyle, ShapeTool } from "./types";
 
 /** Html pixels within which a handle, or the first vertex, is hit. */
 const GRAB = 8;
 const STROKE = "var(--color-accent, #d97706)";
 const SELECTED = "var(--color-danger, #dc2626)";
-const FILL = "rgba(217, 119, 6, 0.12)";
+const FILL_ALPHA = 0.12;
 
 export interface ShapeEditorProps {
   tool: ShapeTool;
@@ -35,6 +45,9 @@ export interface ShapeEditorProps {
   onSelect: (id: string | null) => void;
   /** A drawing tool finished a shape (an app usually returns to the select tool). */
   onDrawn?: (shape: Shape) => void;
+  /** A shape was removed with the Delete key. */
+  onDelete?: (shape: Shape) => void;
+  styles?: Record<string, ShapeStyle>;
   newId?: () => string;
 }
 
@@ -51,6 +64,14 @@ function cleaned(points: Point[]): Point[] {
   );
 }
 
+/** A CSS color at an alpha: a hex color becomes rgba, anything else is used as is. */
+function fillOf(color: string): string {
+  const hex = /^#([0-9a-f]{6})$/i.exec(color);
+  if (!hex) return color.startsWith("var(") ? "rgba(217, 119, 6, 0.12)" : color;
+  const n = parseInt(hex[1]!, 16);
+  return `rgba(${(n >> 16) & 255}, ${(n >> 8) & 255}, ${n & 255}, ${FILL_ALPHA})`;
+}
+
 type Drag = { id: string; handle: number | "move" | "draw"; last: Point };
 
 export function ShapeEditor({
@@ -60,6 +81,8 @@ export function ShapeEditor({
   selectedId,
   onSelect,
   onDrawn,
+  onDelete,
+  styles = {},
   newId = defaultId,
 }: ShapeEditorProps) {
   const camera = useThree((state) => state.camera);
@@ -76,8 +99,17 @@ export function ShapeEditor({
     draftRef.current = typeof update === "function" ? update(draftRef.current) : update;
     setDraftState(draftRef.current);
   };
-  const latest = useRef({ tool, shapes, selected, selectedId, onChange, onSelect, onDrawn });
-  latest.current = { tool, shapes, selected, selectedId, onChange, onSelect, onDrawn };
+  const latest = useRef({
+    tool,
+    shapes,
+    selected,
+    selectedId,
+    onChange,
+    onSelect,
+    onDrawn,
+    onDelete,
+  });
+  latest.current = { tool, shapes, selected, selectedId, onChange, onSelect, onDrawn, onDelete };
   const toHtml = (p: Point) => dataToHtml(camera, v3(p));
 
   const commit = (shape: Shape) => {
@@ -104,9 +136,15 @@ export function ShapeEditor({
     const d = drag.current;
     drag.current = null;
     const current = draftRef.current;
-    if (d?.handle !== "draw" || !current || current.kind !== "ellipse") return;
-    if (current.rx > 0 && current.ry > 0) commit(current);
-    else setDraft(null);
+    if (d?.handle !== "draw" || !current) return;
+    if (current.kind === "ellipse") {
+      if (current.rx > 0 && current.ry > 0) commit(current);
+      else setDraft(null);
+    } else if (current.kind === "rect") {
+      const box = normalizedRect(current);
+      if (box.x1 > box.x0 && box.y1 > box.y0) commit(box);
+      else setDraft(null);
+    }
   };
 
   // a tool change drops the draft
@@ -123,6 +161,12 @@ export function ShapeEditor({
     const p = { x: event.dataPt.x, y: event.dataPt.y };
     if (active === "ellipse") {
       const shape: Shape = { id: newId(), kind: "ellipse", cx: p.x, cy: p.y, rx: 0, ry: 0 };
+      setDraft(shape);
+      drag.current = { id: shape.id, handle: "draw", last: p };
+      return;
+    }
+    if (active === "rect") {
+      const shape: Shape = { id: newId(), kind: "rect", x0: p.x, x1: p.x, y0: p.y, y1: p.y };
       setDraft(shape);
       drag.current = { id: shape.id, handle: "draw", last: p };
       return;
@@ -151,11 +195,13 @@ export function ShapeEditor({
     const d = drag.current;
     if (!d) return;
     if (d.handle === "draw") {
-      setDraft((shape) =>
-        shape && shape.kind === "ellipse"
-          ? { ...shape, rx: Math.abs(p.x - shape.cx), ry: Math.abs(p.y - shape.cy) }
-          : shape,
-      );
+      setDraft((shape) => {
+        if (!shape) return shape;
+        if (shape.kind === "ellipse")
+          return { ...shape, rx: Math.abs(p.x - shape.cx), ry: Math.abs(p.y - shape.cy) };
+        if (shape.kind === "rect") return { ...shape, x1: p.x, y1: p.y };
+        return shape;
+      });
       return;
     }
     const { id, handle } = d;
@@ -205,6 +251,7 @@ export function ShapeEditor({
         selectedId: id,
         onChange: change,
         onSelect: select,
+        onDelete: removed,
       } = latest.current;
       if (event.key === "Escape") {
         setDraft(null);
@@ -214,8 +261,10 @@ export function ShapeEditor({
       } else if (event.key === "Enter" && active === "polygon") {
         closePolygon();
       } else if ((event.key === "Delete" || event.key === "Backspace") && id !== null) {
+        const gone = current.find((s) => s.id === id);
         change(current.filter((s) => s.id !== id));
         select(null);
+        if (gone) removed?.(gone);
       }
     };
     window.addEventListener("keydown", onKey);
@@ -228,54 +277,119 @@ export function ShapeEditor({
   // order, converter outside and portal inside, is the one H5Web's hooks allow
   return (
     <>
-      {shapes.map((shape) => (
-        <ShapeSvg key={shape.id} shape={shape} selected={shape.id === selectedId} />
-      ))}
+      {shapes.map((shape) => {
+        const style = styles[shape.id] ?? {};
+        return [
+          <ShapeSvg
+            key={shape.id}
+            shape={shape}
+            selected={shape.id === selectedId}
+            style={style}
+          />,
+          style.mirrorX ? (
+            <ShapeSvg
+              key={`${shape.id}:mirror`}
+              shape={{ ...mirroredX(shape), id: `${shape.id}:mirror` }}
+              selected={false}
+              style={{ ...style, label: undefined, dashed: true }}
+              twin
+            />
+          ) : null,
+        ];
+      })}
       {draft ? <DraftSvg shape={draft} cursor={cursor} /> : null}
       {selected ? <Handles shape={selected} /> : null}
     </>
   );
 }
 
-function ShapeSvg({ shape, selected }: { shape: Shape; selected: boolean }) {
-  const style = {
-    fill: FILL,
-    stroke: selected ? SELECTED : STROKE,
+function ShapeSvg({
+  shape,
+  selected,
+  style,
+  twin = false,
+}: {
+  shape: Shape;
+  selected: boolean;
+  style: ShapeStyle;
+  twin?: boolean;
+}) {
+  const color = style.color ?? STROKE;
+  const attrs = {
+    fill: fillOf(color),
+    stroke: selected ? SELECTED : color,
     strokeWidth: selected ? 2 : 1.5,
+    strokeDasharray: twin ? "6 4" : style.dashed ? "2 3" : undefined,
   };
-  const points = useMemo(() => handlesOf(shape).map(v3), [shape]);
-  if (shape.kind === "polygon") {
-    if (points.length < 2) return null;
-    return (
-      <DataToHtml points={points}>
-        {(...html) => (
-          <SvgElement>
-            <polygon
-              data-shape={shape.id}
-              data-kind="polygon"
-              points={html.map((h) => `${h.x},${h.y}`).join(" ")}
-              {...style}
-            />
-          </SvgElement>
-        )}
-      </DataToHtml>
-    );
-  }
+  const bounds = useMemo(() => shapeBounds(shape), [shape]);
+  const points = useMemo(
+    () => [...handlesOf(shape).map(v3), v3({ x: bounds.xmin, y: bounds.ymax })],
+    [shape, bounds],
+  );
+  if (shape.kind === "polygon" && points.length < 3) return null;
   return (
     <DataToHtml points={points}>
-      {(c, r, t) => (
-        <SvgElement>
-          <ellipse
-            data-shape={shape.id}
-            data-kind="ellipse"
-            cx={c.x}
-            cy={c.y}
-            rx={Math.abs(r.x - c.x)}
-            ry={Math.abs(t.y - c.y)}
-            {...style}
-          />
-        </SvgElement>
-      )}
+      {(...html) => {
+        const corner = html[html.length - 1]!;
+        const label =
+          style.label !== undefined ? (
+            <text
+              x={corner.x + 4}
+              y={corner.y - 4}
+              fill={color}
+              fontSize={11}
+              style={{ paintOrder: "stroke", stroke: "rgba(0,0,0,0.5)", strokeWidth: 2 }}
+            >
+              {style.label}
+            </text>
+          ) : null;
+        if (shape.kind === "polygon") {
+          const pts = html.slice(0, -1);
+          return (
+            <SvgElement>
+              <polygon
+                data-shape={shape.id}
+                data-kind="polygon"
+                points={pts.map((h) => `${h.x},${h.y}`).join(" ")}
+                {...attrs}
+              />
+              {label}
+            </SvgElement>
+          );
+        }
+        if (shape.kind === "rect") {
+          const [a, , c] = html as [Vector3, Vector3, Vector3, Vector3, Vector3];
+          return (
+            <SvgElement>
+              <rect
+                data-shape={shape.id}
+                data-kind="rect"
+                x={Math.min(a.x, c.x)}
+                y={Math.min(a.y, c.y)}
+                width={Math.abs(c.x - a.x)}
+                height={Math.abs(c.y - a.y)}
+                {...attrs}
+              />
+              {label}
+            </SvgElement>
+          );
+        }
+        const [c, r, t] = html as [Vector3, Vector3, Vector3, Vector3];
+        return (
+          <SvgElement>
+            <ellipse
+              data-shape={shape.id}
+              data-kind="ellipse"
+              cx={c.x}
+              cy={c.y}
+              rx={Math.abs(r.x - c.x)}
+              ry={Math.abs(t.y - c.y)}
+              {...attrs}
+            />
+            {label}
+          </SvgElement>
+        );
+      }}
     </DataToHtml>
   );
 }
@@ -286,6 +400,7 @@ function DraftSvg({ shape, cursor }: { shape: Shape; cursor: Point | null }) {
       (shape.kind === "polygon" && cursor ? [...shape.points, cursor] : handlesOf(shape)).map(v3),
     [shape, cursor],
   );
+  const attrs = { fill: fillOf(STROKE), stroke: STROKE, strokeWidth: 1.5, strokeDasharray: "4 3" };
   if (shape.kind === "ellipse") {
     return (
       <DataToHtml points={points}>
@@ -297,10 +412,25 @@ function DraftSvg({ shape, cursor }: { shape: Shape; cursor: Point | null }) {
               cy={c.y}
               rx={Math.abs(r.x - c.x)}
               ry={Math.abs(t.y - c.y)}
-              fill={FILL}
-              stroke={STROKE}
-              strokeWidth={1.5}
-              strokeDasharray="4 3"
+              {...attrs}
+            />
+          </SvgElement>
+        )}
+      </DataToHtml>
+    );
+  }
+  if (shape.kind === "rect") {
+    return (
+      <DataToHtml points={points}>
+        {(a, _b, c) => (
+          <SvgElement>
+            <rect
+              data-draft="rect"
+              x={Math.min(a.x, c.x)}
+              y={Math.min(a.y, c.y)}
+              width={Math.abs(c.x - a.x)}
+              height={Math.abs(c.y - a.y)}
+              {...attrs}
             />
           </SvgElement>
         )}
