@@ -22,7 +22,7 @@ import {
   type VisScaleType,
 } from "@h5web/lib";
 import ndarray from "ndarray";
-import { useMemo, type ReactNode } from "react";
+import { useMemo, type ComponentProps, type ReactNode } from "react";
 
 export type ImageScale = "linear" | "log" | "symlog" | "sqrt";
 
@@ -63,6 +63,8 @@ export interface ArrayImageProps {
   children?: ReactNode;
   /** SVG drawn in data coordinates over the image. */
   svg?: ReactNode;
+  /** H5Web's default interactions, each configurable or off (`pan: false` while a tool draws). */
+  interactions?: ComponentProps<typeof DefaultInteractions>;
   onHover?: (x: number, y: number) => void;
   onLeave?: () => void;
   onClick?: (x: number, y: number) => void;
@@ -106,6 +108,7 @@ export function ArrayImage({
   colorBarLabel,
   children,
   svg,
+  interactions,
   onHover,
   onLeave,
   onClick,
@@ -128,7 +131,7 @@ export function ArrayImage({
           as a block child they would paint under any opaque background higher up */}
       <div className="relative flex min-h-0 min-w-0 flex-1">
         <VisCanvas abscissaConfig={abscissa} ordinateConfig={ordinate} aspect={aspect}>
-          <DefaultInteractions />
+          <DefaultInteractions {...interactions} />
           <ResetZoomButton />
           <HeatmapMesh
             values={values}

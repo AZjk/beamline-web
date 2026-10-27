@@ -8,6 +8,8 @@ import { expect, test } from "@playwright/test";
 test.skip(!process.env.XPCS_URL, "needs XPCS_URL: an app served over a real pyxpcsviewer-web");
 
 test("load, select, image, panels, fit, tau(q), metadata", async ({ page }) => {
+  const pageErrors: string[] = [];
+  page.on("pageerror", (error) => pageErrors.push(error.message));
   await page.goto("/");
   const rows = page.locator("tr[data-id]");
   await expect(rows.first()).toBeVisible({ timeout: 15_000 });
@@ -36,6 +38,12 @@ test("load, select, image, panels, fit, tau(q), metadata", async ({ page }) => {
   await page.getByLabel("color map").selectOption("viridis");
   await page.waitForTimeout(500);
   expect(imageRequests).toEqual([]);
+
+  // the q-bins overlay blends over the image (one more array, the bins, is fetched)
+  await page.getByLabel("q-bins").check();
+  await expect(image.locator("canvas")).toBeVisible();
+  await page.waitForTimeout(1000);
+  expect(pageErrors).toEqual([]);
 
   // the panels under the image draw
   await expect(page.getByLabel("I(q) figure").locator(".plot-container")).toBeVisible({

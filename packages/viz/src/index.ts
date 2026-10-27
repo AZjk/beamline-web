@@ -15,9 +15,29 @@ export type { ColorStop, ColormapName, H5WebColorMap } from "./colormaps";
 export { ArrayImage, toNdArray } from "./image/ArrayImage";
 export type { ArrayImageProps, ImageExtent, ImageScale } from "./image/ArrayImage";
 export { DetectorImage } from "./image/DetectorImage";
+export { OverlayMesh } from "./image/OverlayMesh";
+export type { OverlayMeshProps } from "./image/OverlayMesh";
 export type { DetectorImageProps, LabelOverlay } from "./image/DetectorImage";
 export { finiteRange, sampledExtent, sampledIndex, valueAt } from "./image/sampling";
 export type { Sampling } from "./image/sampling";
+export {
+  fillShape,
+  handlesOf,
+  pointInEllipse,
+  pointInPolygon,
+  pointInShape,
+  rasterize,
+  shapeBounds,
+  translated,
+  withHandleAt,
+} from "./shapes/geometry";
+export type { Bounds } from "./shapes/geometry";
+export { MaskMesh } from "./shapes/MaskMesh";
+export type { MaskMeshProps } from "./shapes/MaskMesh";
+export { editorInteractions } from "./shapes/interactions";
+export { ShapeEditor } from "./shapes/ShapeEditor";
+export type { ShapeEditorProps } from "./shapes/ShapeEditor";
+export type { EllipseShape, Point, PolygonShape, Shape, ShapeTool } from "./shapes/types";
 export { Plot, loadPlotly, usePlotly } from "./plot/Plot";
 export type { PlotProps } from "./plot/Plot";
 export {

@@ -7,11 +7,11 @@
  * pixel reported to the page, which reads the value from the array it holds.
  */
 
-import { Annotation, HeatmapMesh, ScaleType, type Domain } from "@h5web/lib";
-import ndarray from "ndarray";
+import { Annotation, type Domain } from "@h5web/lib";
 import { useMemo, type ReactNode } from "react";
 
-import { h5webColorMap } from "../colormaps";
+import { SERIES, h5webColorMap } from "../colormaps";
+import { OverlayMesh } from "./OverlayMesh";
 import { ArrayImage, type ImageScale } from "./ArrayImage";
 import { sampledExtent, type Sampling } from "./sampling";
 
@@ -44,67 +44,6 @@ export interface DetectorImageProps {
   className?: string;
 }
 
-const OVERLAY_COLORS = 8;
-
-/** The labels cycled through eight hues, and an alpha channel that hides what has no label. */
-function overlayArrays(overlay: LabelOverlay) {
-  const { data, sampling } = overlay;
-  const hue = new Float32Array(data.length);
-  const alpha = new Uint8Array(data.length);
-  const highlight = new Float32Array(data.length);
-  const alphaHighlight = new Uint8Array(data.length);
-  const a = Math.round(255 * (overlay.opacity ?? 0.4));
-  for (let i = 0; i < data.length; i += 1) {
-    const v = data[i]!;
-    const on = Number.isFinite(v) && v > 0;
-    hue[i] = on ? (v - 1) % OVERLAY_COLORS : 0;
-    alpha[i] = on ? a : 0;
-    const chosen =
-      on &&
-      overlay.highlighted !== null &&
-      overlay.highlighted !== undefined &&
-      v === overlay.highlighted;
-    highlight[i] = 1;
-    alphaHighlight[i] = chosen ? 217 : 0;
-  }
-  const shape = [sampling.rows, sampling.cols];
-  return {
-    hue: ndarray(hue, shape),
-    alpha: ndarray(alpha, shape),
-    highlight: ndarray(highlight, shape),
-    alphaHighlight: ndarray(alphaHighlight, shape),
-    any: overlay.highlighted !== null && overlay.highlighted !== undefined,
-  };
-}
-
-function Overlay({ overlay }: { overlay: LabelOverlay }) {
-  const arrays = useMemo(() => overlayArrays(overlay), [overlay]);
-  return (
-    <>
-      <HeatmapMesh
-        values={arrays.hue}
-        domain={[-0.5, OVERLAY_COLORS - 0.5]}
-        scaleType={ScaleType.Linear}
-        colorMap="Rainbow"
-        alphaValues={arrays.alpha}
-        alphaDomain={[0, 255]}
-      />
-      {arrays.any ? (
-        <HeatmapMesh
-          values={arrays.highlight}
-          domain={[0, 1]}
-          scaleType={ScaleType.Linear}
-          colorMap="Greys"
-          invertColorMap
-          alphaValues={arrays.alphaHighlight}
-          alphaDomain={[0, 255]}
-        />
-      ) : null}
-    </>
-  );
-}
-
-/** A cross of fixed screen size at the beam center, placed in data coordinates. */
 function BeamCenter({ center }: { center: [number, number] }) {
   return (
     <Annotation x={center[0]} y={center[1]} center style={{ pointerEvents: "none" }}>
@@ -163,7 +102,16 @@ export function DetectorImage({
       className={className}
       svg={svg}
     >
-      {overlay ? <Overlay overlay={overlay} /> : null}
+      {overlay ? (
+        <OverlayMesh
+          values={overlay.data}
+          rows={overlay.sampling.rows}
+          cols={overlay.sampling.cols}
+          palette={SERIES}
+          opacity={overlay.opacity ?? 0.4}
+          highlighted={overlay.highlighted ?? null}
+        />
+      ) : null}
       {beamCenter ? <BeamCenter center={beamCenter} /> : null}
     </ArrayImage>
   );

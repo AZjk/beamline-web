@@ -19,7 +19,8 @@ An app (`apps/<tool>`) is a Vite + React page built from the kit:
 The kit knows nothing of the science: `@beamline-web/ui` is the shell, the file browser, the
 metadata card, the tree and the store slice; `@beamline-web/viz` draws arrays (`ArrayImage`,
 `DetectorImage`) and Plotly figures (`Plot`, `g2Figure`) from plain numbers; `@beamline-web/client`
-talks to a service built on `beamline_webkit`.
+talks to a service built on `beamline_webkit`. `@beamline-web/viz` also holds the shape editor
+of the [mask-editor spike](spikes/mask-editor.md), the base of ROI and mask tools.
 
 ## Adding a plugin (a tab or a panel)
 
